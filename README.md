@@ -4,6 +4,17 @@ osmi-front/
 ├── public/
 ├── src/
 │   ├── app/                         ← Rutas principales (Next.js App Router)
+│   │   ├── (info)/
+│   │   │   ├── sobre-nosotros/
+│   │   │   │   └── page.tsx
+│   │   │   ├── privacidad/
+│   │   │   │   └── page.tsx
+│   │   │   ├── terminos/
+│   │   │   │   └── page.tsx
+│   │   │   ├── cookies/
+│   │   │   │   └── page.tsx
+│   │   │   └── prensa/
+│   │   │       └── page.tsx
 │   │   ├── (auth)/
 │   │   │   └── login/
 │   │   │       └── page.tsx         ← Página de Login

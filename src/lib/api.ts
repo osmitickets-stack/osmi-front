@@ -1,3 +1,4 @@
+// scr/app/(dashboard)/dashboard
 // src/lib/api.ts — Cliente HTTP para el backend gRPC-Gateway
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8083";

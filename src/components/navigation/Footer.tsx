@@ -30,10 +30,31 @@ export const Footer = () => {
         <div>
           <h4 className="text-sm font-semibold text-foreground mb-4">osmi</h4>
           <ul className="space-y-2.5">
-            <li><Link href="#" className="text-sm text-muted-dark hover:text-foreground transition-colors">Sobre nosotros</Link></li>
-            <li><Link href="#" className="text-sm text-muted-dark hover:text-foreground transition-colors">Para organizadores</Link></li>
-            <li><Link href="#" className="text-sm text-muted-dark hover:text-foreground transition-colors">Contacto</Link></li>
-            <li><Link href="#" className="text-sm text-muted-dark hover:text-foreground transition-colors">Prensa</Link></li>
+            <li>
+              <Link href="/sobre-nosotros" className="text-sm text-muted-dark hover:text-foreground transition-colors">
+                Sobre nosotros
+              </Link>
+            </li>
+            <li>
+              <Link href="/para-organizadores" className="text-sm text-muted-dark hover:text-foreground transition-colors">
+                Para organizadores
+              </Link>
+            </li>
+            <li>
+              <a
+                href="https://wa.me/523345998987?text=Hola%20osmi%20quiero%20informacion"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-muted-dark hover:text-foreground transition-colors"
+              >
+                Contacto
+              </a>
+            </li>
+            <li>
+              <Link href="/prensa" className="text-sm text-muted-dark hover:text-foreground transition-colors">
+                Prensa
+              </Link>
+            </li>
           </ul>
         </div>
 
@@ -41,9 +62,31 @@ export const Footer = () => {
         <div>
           <h4 className="text-sm font-semibold text-foreground mb-4">Legal</h4>
           <ul className="space-y-2.5">
-            <li><Link href="#" className="text-sm text-muted-dark hover:text-foreground transition-colors">Privacidad</Link></li>
-            <li><Link href="#" className="text-sm text-muted-dark hover:text-foreground transition-colors">Terminos</Link></li>
-            <li><Link href="#" className="text-sm text-muted-dark hover:text-foreground transition-colors">Cookies</Link></li>
+            <li>
+              <a
+                href="/docs/privacidad.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-muted-dark hover:text-foreground transition-colors"
+              >
+                Privacidad
+              </a>
+            </li>
+            <li>
+              <a
+                href="/docs/terminos.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-muted-dark hover:text-foreground transition-colors"
+              >
+                Terminos y condiciones
+              </a>
+            </li>
+            <li>
+              <Link href="/cookies" className="text-sm text-muted-dark hover:text-foreground transition-colors">
+                Cookies
+              </Link>
+            </li>
           </ul>
         </div>
       </div>
@@ -52,7 +95,7 @@ export const Footer = () => {
         <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-dark">
           <p>2026 osmi. Todos los derechos reservados.</p>
           <p>
-            Creado por <span className="text-gradient font-semibold">Desfragmentado el MC Legendario</span>
+            Creado por <span className="text-gradient font-semibold">Francisco D. Zamora</span>
           </p>
         </div>
       </div>

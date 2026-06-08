@@ -55,7 +55,7 @@ export const Navbar = () => {
         <nav className="hidden lg:flex items-center gap-1">
           <Link href="/events" className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${pathname.startsWith("/events") ? "bg-white/[0.06] text-foreground" : "text-muted hover:text-foreground hover:bg-white/[0.03]"}`}>Explorar</Link>
           <Link href="/events" className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${pathname === "/categorias" ? "bg-white/[0.06] text-foreground" : "text-muted hover:text-foreground hover:bg-white/[0.03]"}`}>Categorias</Link>
-          <Link href="#" className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${pathname === "/organizadores" ? "bg-white/[0.06] text-foreground" : "text-muted hover:text-foreground hover:bg-white/[0.03]"}`}>Para Organizadores</Link>
+          <Link href="/para-organizadores" className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${pathname === "/organizadores" ? "bg-white/[0.06] text-foreground" : "text-muted hover:text-foreground hover:bg-white/[0.03]"}`}>Para Organizadores</Link>
         </nav>
 
         {/* Auth */}
