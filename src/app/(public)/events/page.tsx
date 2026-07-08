@@ -1,4 +1,7 @@
 // src/app/(public)/events/page.tsx
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 import { Metadata } from "next";
 import { api } from "@/lib/api";
 import { Navbar } from "@/components/navigation/Navbar";

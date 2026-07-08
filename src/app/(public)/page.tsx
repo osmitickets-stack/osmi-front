@@ -1,3 +1,7 @@
+// src/app/(public)/page.tsx
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 import { Navbar } from "@/components/navigation/Navbar";
 import { HeroSection } from "@/components/home/HeroSection";
 import { EventCard } from "@/components/ui/EventCard";

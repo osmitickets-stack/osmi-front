@@ -25,9 +25,6 @@ async function request<T = any>(endpoint: string, options: RequestOptions = {}):
     method,
     headers,
     body: body ? JSON.stringify(body) : undefined,
-    next: {
-      revalidate: 60,
-    },
   });
 
   if (!response.ok) {
