@@ -3,26 +3,24 @@ import { Navbar } from "@/components/navigation/Navbar";
 import { Footer } from "@/components/navigation/Footer";
 import {
   Music,
+  Music2,
   Mic2,
   PlayCircle,
   Newspaper,
   Handshake,
   Megaphone,
   Mail,
-  Instagram,
-  Facebook,
-  Youtube,
-  Music2,
   MessageCircle,
   ExternalLink,
   Target,
-  Eye,
   Heart,
   ArrowRight,
   Sparkles,
-  Calendar,
   Award,
-  TrendingUp
+  TrendingUp,
+  Globe,
+  Users,
+  Radio
 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -55,7 +53,7 @@ export default function DesfragmentadoPage() {
             <p className="text-xl font-semibold text-primary mb-3">
               El MC Legendario
             </p>
-            <div className="flex justify-center gap-2 text-sm text-muted mb-4">
+            <div className="flex justify-center gap-2 text-sm text-muted mb-4 flex-wrap">
               <span className="px-3 py-1 bg-primary/10 rounded-full">Rap</span>
               <span className="px-3 py-1 bg-secondary/10 rounded-full">Hip Hop</span>
               <span className="px-3 py-1 bg-accent/10 rounded-full">Storytelling</span>
@@ -83,7 +81,7 @@ export default function DesfragmentadoPage() {
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-6 py-3 bg-[#FF0000] text-white font-bold rounded-xl hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-[#FF0000]/30"
               >
-                <Youtube size={20} />
+                <PlayCircle size={20} />
                 Ver YouTube
                 <ExternalLink size={16} />
               </a>
@@ -218,7 +216,7 @@ export default function DesfragmentadoPage() {
               className="flex items-center justify-between p-4 bg-[#FF0000]/10 rounded-xl hover:bg-[#FF0000]/20 transition-all duration-300 border border-[#FF0000]/20"
             >
               <div className="flex items-center gap-3">
-                <Youtube size={24} className="text-[#FF0000]" />
+                <PlayCircle size={24} className="text-[#FF0000]" />
                 <span className="font-semibold">YouTube</span>
               </div>
               <ArrowRight size={20} className="text-[#FF0000]" />
@@ -231,7 +229,7 @@ export default function DesfragmentadoPage() {
               className="flex items-center justify-between p-4 bg-black/10 rounded-xl hover:bg-black/20 transition-all duration-300 border border-black/20"
             >
               <div className="flex items-center gap-3">
-                <span className="text-2xl">🎵</span>
+                <Radio size={24} className="text-black" />
                 <span className="font-semibold">TikTok</span>
               </div>
               <ArrowRight size={20} className="text-muted" />
@@ -244,7 +242,7 @@ export default function DesfragmentadoPage() {
               className="flex items-center justify-between p-4 bg-[#E4405F]/10 rounded-xl hover:bg-[#E4405F]/20 transition-all duration-300 border border-[#E4405F]/20"
             >
               <div className="flex items-center gap-3">
-                <Instagram size={24} className="text-[#E4405F]" />
+                <Globe size={24} className="text-[#E4405F]" />
                 <span className="font-semibold">Instagram</span>
               </div>
               <ArrowRight size={20} className="text-[#E4405F]" />
@@ -268,7 +266,7 @@ export default function DesfragmentadoPage() {
               rel="noopener noreferrer"
               className="flex items-center gap-2 justify-center p-3 bg-[#E4405F]/10 rounded-xl hover:bg-[#E4405F]/20 transition-all duration-300 border border-[#E4405F]/20"
             >
-              <Instagram size={18} className="text-[#E4405F]" />
+              <Globe size={18} className="text-[#E4405F]" />
               <span className="text-sm font-medium">Instagram</span>
             </a>
             
@@ -278,7 +276,7 @@ export default function DesfragmentadoPage() {
               rel="noopener noreferrer"
               className="flex items-center gap-2 justify-center p-3 bg-[#1877F2]/10 rounded-xl hover:bg-[#1877F2]/20 transition-all duration-300 border border-[#1877F2]/20"
             >
-              <Facebook size={18} className="text-[#1877F2]" />
+              <Users size={18} className="text-[#1877F2]" />
               <span className="text-sm font-medium">Facebook</span>
             </a>
             
@@ -288,7 +286,7 @@ export default function DesfragmentadoPage() {
               rel="noopener noreferrer"
               className="flex items-center gap-2 justify-center p-3 bg-black/10 rounded-xl hover:bg-black/20 transition-all duration-300 border border-black/20"
             >
-              <span className="text-lg">🎵</span>
+              <Radio size={18} className="text-black" />
               <span className="text-sm font-medium">TikTok</span>
             </a>
             
@@ -308,7 +306,7 @@ export default function DesfragmentadoPage() {
               rel="noopener noreferrer"
               className="flex items-center gap-2 justify-center p-3 bg-[#FF0000]/10 rounded-xl hover:bg-[#FF0000]/20 transition-all duration-300 border border-[#FF0000]/20"
             >
-              <Youtube size={18} className="text-[#FF0000]" />
+              <PlayCircle size={18} className="text-[#FF0000]" />
               <span className="text-sm font-medium">YouTube</span>
             </a>
           </div>
@@ -427,7 +425,7 @@ export default function DesfragmentadoPage() {
             <ExternalLink size={18} />
           </a>
           <p className="text-xs text-muted mt-2 text-center">
-            * Reemplaza el número de teléfono en el enlace para activar el contacto directo
+            📱 Contacto directo por WhatsApp
           </p>
         </section>
 
