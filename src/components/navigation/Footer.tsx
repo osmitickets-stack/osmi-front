@@ -55,8 +55,14 @@ export const Footer = () => {
                 Prensa
               </Link>
             </li>
+            <li>
+              <Link href="/desfragmentado" className="text-sm text-muted-dark hover:text-foreground transition-colors">
+                Desfragmentado
+              </Link>
+            </li>
           </ul>
         </div>
+        
 
         {/* Legal */}
         <div>
@@ -93,7 +99,7 @@ export const Footer = () => {
 
       <div className="border-t border-white/5 py-6">
         <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-dark">
-          <p>2026 osmi. Todos los derechos reservados.</p>
+          <p>© 2026 osmi. Todos los derechos reservados.</p>
           <p>
             Creado por <span className="text-gradient font-semibold">Francisco D. Zamora</span>
           </p>
