@@ -1,3 +1,5 @@
+// src/modules/events/api.ts 
+
 import { api } from "@/lib/api";
 import { EventListResponse } from "./types";
 

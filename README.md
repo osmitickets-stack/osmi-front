@@ -4,6 +4,11 @@ osmi-front/
 ├── public/
 ├── src/
 │   ├── app/                         ← Rutas principales (Next.js App Router)
+│   │   ├── (auth)/
+│   │   │   └── login/
+│   │   │       └── page.tsx         ← Página de Login
+│   │   ├── (dashboard)/
+│   │   │   └── dashboard/           ← Página de Dashboard
 │   │   ├── (info)/
 │   │   │   ├── sobre-nosotros/
 │   │   │   │   └── page.tsx
@@ -15,11 +20,6 @@ osmi-front/
 │   │   │   │   └── page.tsx
 │   │   │   └── prensa/
 │   │   │       └── page.tsx
-│   │   ├── (auth)/
-│   │   │   └── login/
-│   │   │       └── page.tsx         ← Página de Login
-│   │   ├── (dashboard)/
-│   │   │   └── dashboard/           ← Página de Dashboard
 │   │   ├── (public)/
 │   │   │   └── events/
 │   │   │       ├── [public_id]/
@@ -70,7 +70,7 @@ osmi-front/
 │   │   │   └── components/          ← Componentes de pagos
 │   │   └── tickets/                 ← Lógica de tickets
 │   │
-│   ├── services/                    ← Servicios externos
+│   ├── services/                    ← Servicios externos #noexiste esta carpeta
 │   │    
     ├── store/                       ← Estado global (Zustand)
     │   └── cart.ts    
