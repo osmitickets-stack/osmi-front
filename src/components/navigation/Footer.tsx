@@ -60,6 +60,11 @@ export const Footer = () => {
                 Desfragmentado
               </Link>
             </li>
+            <li>
+              <Link href="/Manitas" className="text-sm text-muted-dark hover:text-foreground transition-colors">
+                Taller Manitas
+              </Link>
+            </li>
           </ul>
         </div>
         
