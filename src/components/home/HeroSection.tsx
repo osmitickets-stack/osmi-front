@@ -9,11 +9,6 @@ import {
   MapPin,
   ChevronLeft,
   ChevronRight,
-  Search,
-  Sparkles,
-  Users,
-  Star,
-  Mic2,
 } from "lucide-react";
 
 import { api } from "@/lib/api";
@@ -67,7 +62,6 @@ export const HeroSection = () => {
   const [events, setEvents] = useState<NormalizedEvent[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     async function fetchEvents() {
@@ -90,7 +84,6 @@ export const HeroSection = () => {
     ...events.map((event) => ({ type: "event" as const, event })),
   ];
 
-  // Auto-slide
   useEffect(() => {
     if (allSlides.length <= 1) return;
     const interval = setInterval(() => {
@@ -118,6 +111,7 @@ export const HeroSection = () => {
   if (allSlides.length === 0) return null;
 
   const slide = allSlides[currentIndex];
+
   const featuredEvent = events.find((e) => e.image_url) || events[0] || null;
 
   const formattedDate = featuredEvent
@@ -130,47 +124,14 @@ export const HeroSection = () => {
 
   return (
     <section className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 pb-4">
-      {/* ============================================================
-          BUSCADOR - ARREGLADO (lupa y texto bien espaciados)
-      ============================================================ */}
-      <div className="mb-6 sm:mb-8">
-        <div className="glass-card p-1.5 flex items-center gap-2 max-w-2xl mx-auto border border-white/5 hover:border-primary/20 transition-all duration-300">
-          <div className="pl-4 text-muted-dark flex-shrink-0">
-            <Search size={18} />
-          </div>
-          <input
-            type="text"
-            placeholder="Buscar eventos, artistas o lugares..."
-            className="w-full px-3 py-3 bg-transparent text-foreground placeholder-muted-dark focus:outline-none text-sm sm:text-base"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          <button className="btn-primary px-4 sm:px-6 py-2.5 text-sm rounded-full whitespace-nowrap flex-shrink-0 mr-1">
-            Buscar
-          </button>
-        </div>
-
-        {/* Tags populares */}
-        <div className="flex flex-wrap justify-center gap-2 mt-3">
-          {["Conciertos", "Deportes", "Teatro", "Festivales", "Experiencias"].map((tag) => (
-            <Link
-              key={tag}
-              href={`/events?category=${tag.toLowerCase()}`}
-              className="px-3 py-1 text-xs rounded-full bg-white/5 border border-white/5 text-muted hover:text-foreground hover:border-primary/20 transition-all duration-300"
-            >
-              {tag}
-            </Link>
-          ))}
-        </div>
-      </div>
-
-      {/* ============================================================
-          HERO PRINCIPAL
-      ============================================================ */}
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6 sm:gap-8">
-        {/* CARRUSEL */}
+
+        {/* ============================================================
+            CARRUSEL - CENTRADO CON ESQUINAS REDONDEADAS
+        ============================================================ */}
         <div className="relative overflow-hidden rounded-[30px] sm:rounded-[40px] border border-white/[0.06] min-h-[400px] sm:min-h-[520px] lg:min-h-[600px] flex items-end group">
-          {/* Imagen de fondo */}
+          
+          {/* Imagen de fondo - OCUPA TODO EL ESPACIO */}
           <div className="absolute inset-0 transition-opacity duration-700">
             {slide.type === "event" && slide.event?.image_url ? (
               <Image
@@ -195,43 +156,23 @@ export const HeroSection = () => {
             )}
           </div>
 
-          {/* Gradientes overlay */}
-          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+          {/* Gradientes overlay - MEJORADOS PARA CENTRAR */}
+          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/60 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
 
           {/* ============================================================
-              FLECHAS DEL CARRUSEL - SIEMPRE VISIBLES EN MÓVIL
+              INDICADORES DEL CARRUSEL - ARRIBA (sin sobreponer texto)
           ============================================================ */}
           {allSlides.length > 1 && (
-            <>
-              <button
-                onClick={goPrev}
-                className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/60 backdrop-blur-xl border border-white/10 flex items-center justify-center text-white hover:bg-black/80 hover:border-primary/30 transition-all duration-300 opacity-70 sm:opacity-0 sm:group-hover:opacity-100"
-                aria-label="Anterior"
-              >
-                <ChevronLeft size={18} className="sm:size-5" />
-              </button>
-              <button
-                onClick={goNext}
-                className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/60 backdrop-blur-xl border border-white/10 flex items-center justify-center text-white hover:bg-black/80 hover:border-primary/30 transition-all duration-300 opacity-70 sm:opacity-0 sm:group-hover:opacity-100"
-                aria-label="Siguiente"
-              >
-                <ChevronRight size={18} className="sm:size-5" />
-              </button>
-            </>
-          )}
-
-          {/* Indicadores del carrusel */}
-          {allSlides.length > 1 && (
-            <div className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-1.5 sm:gap-2">
+            <div className="absolute top-4 sm:top-6 left-1/2 -translate-x-1/2 z-20 flex gap-1.5 sm:gap-2">
               {allSlides.map((_, i) => (
                 <button
                   key={i}
                   onClick={() => goTo(i)}
                   className={`transition-all duration-300 ${
                     i === currentIndex
-                      ? "w-6 sm:w-8 h-2 bg-primary rounded-full"
-                      : "w-2 h-2 rounded-full bg-white/30 hover:bg-white/50"
+                      ? "w-6 sm:w-8 h-2 bg-primary rounded-full shadow-lg shadow-primary/30"
+                      : "w-2 h-2 rounded-full bg-white/40 hover:bg-white/60"
                   }`}
                   aria-label={`Ir al slide ${i + 1}`}
                 />
@@ -239,46 +180,77 @@ export const HeroSection = () => {
             </div>
           )}
 
-          {/* Contenido del slide */}
-          <div className="relative z-10 p-6 sm:p-8 lg:p-12 xl:p-16 w-full max-w-2xl">
-            <span className="inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] sm:text-xs font-bold uppercase tracking-[0.15em] mb-4 sm:mb-6">
+          {/* ============================================================
+              FLECHAS DEL CARRUSEL - SIEMPRE VISIBLES Y MÁS GRANDES
+          ============================================================ */}
+          {allSlides.length > 1 && (
+            <>
+              <button
+                onClick={goPrev}
+                className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-black/60 backdrop-blur-xl border border-white/15 flex items-center justify-center text-white hover:bg-black/80 hover:border-primary/40 transition-all duration-300 hover:scale-105"
+                aria-label="Anterior"
+              >
+                <ChevronLeft size={22} className="sm:size-6" />
+              </button>
+              <button
+                onClick={goNext}
+                className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-black/60 backdrop-blur-xl border border-white/15 flex items-center justify-center text-white hover:bg-black/80 hover:border-primary/40 transition-all duration-300 hover:scale-105"
+                aria-label="Siguiente"
+              >
+                <ChevronRight size={22} className="sm:size-6" />
+              </button>
+            </>
+          )}
+
+          {/* ============================================================
+              CONTENIDO - CENTRADO Y CON BUEN ESPACIO
+          ============================================================ */}
+          <div className="relative z-10 p-6 sm:p-8 lg:p-10 xl:p-14 w-full max-w-2xl">
+            {/* Badge */}
+            <span className="inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-primary/15 border border-primary/25 text-primary text-[10px] sm:text-xs font-bold uppercase tracking-[0.15em] mb-3 sm:mb-4">
               {slide.type === "ad" ? slide.badge : slide.event?.min_price > 0 ? "Boletos disponibles" : "Próximamente"}
             </span>
 
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-black leading-[0.95] tracking-tight mb-3 sm:mb-4 text-white">
+            {/* Título */}
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-black leading-[0.95] tracking-tight mb-3 sm:mb-4 text-white drop-shadow-lg">
               {slide.type === "ad" ? slide.title : slide.event?.name}
             </h1>
 
-            <p className="text-sm sm:text-base text-muted max-w-xl leading-relaxed mb-4 sm:mb-6 line-clamp-2">
+            {/* Descripción - AHORA CON FONDO PARA LEGIBILIDAD */}
+            <p className="text-sm sm:text-base text-muted max-w-xl leading-relaxed mb-4 sm:mb-6 line-clamp-2 bg-black/20 backdrop-blur-sm p-2 sm:p-3 rounded-xl border border-white/5">
               {slide.type === "ad" ? slide.description : slide.event?.description}
             </p>
 
+            {/* Fecha y ubicación */}
             {slide.type === "event" && (
-              <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-xs sm:text-sm text-muted mb-4 sm:mb-6">
+              <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-xs sm:text-sm text-muted mb-4 sm:mb-6 bg-black/20 backdrop-blur-sm p-2 sm:p-3 rounded-xl border border-white/5">
                 <div className="flex items-center gap-2">
                   <Calendar size={14} className="sm:size-4 text-secondary" />
-                  <span>{new Date(slide.event.start_date).toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "long" })}</span>
+                  <span className="text-white/80">
+                    {new Date(slide.event.start_date).toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "long" })}
+                  </span>
                 </div>
                 {slide.event.location && (
                   <div className="flex items-center gap-2">
                     <MapPin size={14} className="sm:size-4 text-secondary" />
-                    <span>{slide.event.location}</span>
+                    <span className="text-white/80">{slide.event.location}</span>
                   </div>
                 )}
               </div>
             )}
 
+            {/* Botones - MÁS GRANDES Y FÁCILES DE PRESIONAR */}
             <div className="flex flex-wrap gap-3 sm:gap-4">
               <Link
                 href={slide.type === "ad" ? slide.link : `/events/${slide.event?.public_id}`}
-                className="inline-flex items-center gap-2 px-5 sm:px-8 py-2.5 sm:py-4 rounded-full bg-primary text-sm font-bold text-white hover:bg-primary/90 transition-all shadow-xl shadow-primary/20"
+                className="inline-flex items-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 rounded-full bg-primary text-sm sm:text-base font-bold text-white hover:bg-primary/90 transition-all shadow-xl shadow-primary/30 hover:shadow-primary/50 hover:scale-105 active:scale-95"
               >
                 {slide.type === "ad" ? slide.linkText : "Ver evento"}
-                <ArrowRight size={16} className="sm:size-4" />
+                <ArrowRight size={18} className="sm:size-5" />
               </Link>
               <Link
                 href="/events"
-                className="inline-flex items-center gap-2 px-5 sm:px-8 py-2.5 sm:py-4 rounded-full bg-white/[0.04] border border-white/[0.06] text-sm font-semibold text-foreground hover:bg-white/[0.08] transition-all"
+                className="inline-flex items-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 rounded-full bg-white/[0.06] border border-white/[0.08] text-sm sm:text-base font-semibold text-foreground hover:bg-white/[0.12] hover:border-primary/30 transition-all hover:scale-105 active:scale-95"
               >
                 Explorar más
               </Link>
@@ -337,7 +309,7 @@ export const HeroSection = () => {
                   </div>
                   <Link
                     href={`/events/${featuredEvent.public_id}`}
-                    className="px-4 sm:px-6 py-2 sm:py-3 rounded-full bg-primary text-xs sm:text-sm font-bold text-white hover:bg-primary/90 transition-all shadow-lg shadow-primary/20"
+                    className="px-5 sm:px-6 py-2.5 sm:py-3 rounded-full bg-primary text-sm font-bold text-white hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 hover:scale-105 active:scale-95"
                   >
                     Ver
                   </Link>
@@ -373,7 +345,7 @@ export const HeroSection = () => {
                 </div>
                 <Link
                   href="/events"
-                  className="block w-full text-center mt-4 sm:mt-6 py-2.5 sm:py-3 rounded-full bg-primary text-xs sm:text-sm font-bold text-white hover:bg-primary/90 transition-all shadow-lg shadow-primary/20"
+                  className="block w-full text-center mt-4 sm:mt-6 py-2.5 sm:py-3 rounded-full bg-primary text-xs sm:text-sm font-bold text-white hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95"
                 >
                   Ver todos los eventos
                 </Link>
