@@ -5,26 +5,44 @@ import "./globals.css";
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
+  display: "swap", // Mejora el rendimiento de carga
 });
 
+// ============================================================
+// METADATA CON SEO PREMIUM
+// ============================================================
 export const metadata: Metadata = {
-  title: "osmi — momentos inolvidables",
+  title: {
+    default: "osmi — Boletos para conciertos, deportes y eventos",
+    template: "%s | osmi",
+  },
   description:
-    "La experiencia de boletos más inteligente del planeta. Compra segura, entrega inmediata, soporte 24/7. Vive lo inolvidable con osmi.",
+    "Compra boletos para conciertos, deportes, teatro y festivales. osmi es la plataforma de ticketing más inteligente con entrega inmediata y soporte 24/7.",
   keywords: [
-    "boletos", "conciertos", "eventos", "tickets", "osmi",
-    "deportes", "teatro", "festivales", "experiencias",
-    "Desfragmentado", "Desfragmentado el MC Legendario",
-    "Francisco D Zamora", "ticketing digital", "boletera inteligente",
+    "boletos",
+    "conciertos",
+    "deportes",
+    "teatro",
+    "festivales",
+    "ticketing",
+    "eventos",
+    "osmi",
+    "compra de boletos",
+    "experiencias",
+    "Desfragmentado",
+    "Francisco D Zamora",
   ],
   authors: [{ name: "Francisco D Zamora", url: "https://osmi.app" }],
   creator: "Francisco D Zamora",
   publisher: "osmi by Francisco D Zamora",
   metadataBase: new URL("https://osmi.app"),
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
-    title: "osmi — Vive lo inolvidable",
+    title: "osmi — Boletos para conciertos, deportes y eventos",
     description:
-      "La nueva generación de ticketing digital. Seguro, rápido y con la mejor experiencia. Por Francisco D Zamora.",
+      "Compra boletos seguros para los mejores eventos. Entrega inmediata y soporte 24/7.",
     type: "website",
     locale: "es_MX",
     siteName: "osmi",
@@ -33,26 +51,39 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "osmi — momentos inolvidables",
+        alt: "osmi - Boletos para eventos",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "osmi — Vive lo inolvidable",
-    description:
-      "Ticketing digital de clase mundial. Por Francisco D Zamora.",
+    title: "osmi — Boletos para conciertos, deportes y eventos",
+    description: "Compra boletos seguros para los mejores eventos.",
     images: ["/og-image.png"],
   },
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  verification: {
+    google: "tu-codigo-de-verificacion-google", // Reemplaza con tu código
   },
   icons: {
     icon: "/favicon.ico",
     apple: "/apple-icon.png",
   },
 };
+
+// ============================================================
+// LAYOUT
+// ============================================================
 
 export default function RootLayout({
   children,
