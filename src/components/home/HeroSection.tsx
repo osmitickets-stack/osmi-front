@@ -9,6 +9,8 @@ import {
   MapPin,
   ChevronLeft,
   ChevronRight,
+  Clock,
+  Users,
 } from "lucide-react";
 
 import { api } from "@/lib/api";
@@ -40,7 +42,7 @@ const AD_SLIDES = [
     linkText: "Saber más",
     color: "from-primary/40 via-secondary/20",
     badge: "ORGANIZADORES",
-    image: `${CLOUDINARY_BASE}/v1779263289/desfragmentado_msu9ev.jpg`,
+    image: `${CLOUDINARY_BASE}/v1779177598/studio2.jpg`,
   },
   {
     id: "tienda",
@@ -76,6 +78,16 @@ export const HeroSection = () => {
     fetchEvents();
   }, []);
 
+  // Buscar el evento de Desfragmentado específicamente
+  const desfragmentadoEvent = events.find(
+    (e) => e.name?.toLowerCase().includes("desfragmentado") || 
+           e.slug?.includes("desfragmentado") ||
+           e.organizer?.toLowerCase().includes("desfragmentado")
+  );
+
+  // Usar el evento de Desfragmentado como destacado si existe, si no el primero
+  const featuredEvent = desfragmentadoEvent || events.find((e) => e.image_url) || events[0] || null;
+
   const allSlides = [
     ...AD_SLIDES.map((ad) => ({ type: "ad" as const, ...ad })),
     ...events.map((event) => ({ type: "event" as const, event })),
@@ -108,7 +120,6 @@ export const HeroSection = () => {
   if (allSlides.length === 0) return null;
 
   const slide = allSlides[currentIndex];
-  const featuredEvent = events.find((e) => e.image_url) || events[0] || null;
 
   const formattedDate = featuredEvent
     ? new Date(featuredEvent.start_date).toLocaleDateString("es-MX", {
@@ -151,9 +162,9 @@ export const HeroSection = () => {
             )}
           </div>
 
-          {/* Gradientes - MEJORADOS PARA LEGIBILIDAD */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+          {/* Gradientes mejorados para legibilidad */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
 
           {/* Indicadores arriba */}
           {allSlides.length > 1 && (
@@ -173,19 +184,19 @@ export const HeroSection = () => {
             </div>
           )}
 
-          {/* Flechas - MÁS GRANDES */}
+          {/* Flechas - MÁS GRANDES Y VISIBLES */}
           {allSlides.length > 1 && (
             <>
               <button
                 onClick={goPrev}
-                className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-14 sm:h-14 rounded-full bg-black/70 backdrop-blur-xl border border-white/15 flex items-center justify-center text-white hover:bg-black/90 hover:border-primary/40 transition-all duration-300 hover:scale-105"
+                className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-14 sm:h-14 rounded-full bg-black/70 backdrop-blur-xl border border-white/15 flex items-center justify-center text-white hover:bg-black/90 hover:border-primary/40 transition-all duration-300 hover:scale-105 active:scale-95"
                 aria-label="Anterior"
               >
                 <ChevronLeft size={20} className="sm:size-6" />
               </button>
               <button
                 onClick={goNext}
-                className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-14 sm:h-14 rounded-full bg-black/70 backdrop-blur-xl border border-white/15 flex items-center justify-center text-white hover:bg-black/90 hover:border-primary/40 transition-all duration-300 hover:scale-105"
+                className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-14 sm:h-14 rounded-full bg-black/70 backdrop-blur-xl border border-white/15 flex items-center justify-center text-white hover:bg-black/90 hover:border-primary/40 transition-all duration-300 hover:scale-105 active:scale-95"
                 aria-label="Siguiente"
               >
                 <ChevronRight size={20} className="sm:size-6" />
@@ -193,49 +204,68 @@ export const HeroSection = () => {
             </>
           )}
 
-          {/* CONTENIDO - CENTRADO CON ESPACIO */}
+          {/* CONTENIDO - CENTRADO CON BUEN ESPACIO */}
           <div className="relative z-10 p-6 sm:p-8 lg:p-10 xl:p-14 w-full max-w-2xl">
-            <span className="inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-primary/20 border border-primary/30 text-primary text-[10px] sm:text-xs font-bold uppercase tracking-[0.15em] mb-3 sm:mb-4 backdrop-blur-sm">
+            {/* Badge con borde neón */}
+            <span className="inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-primary/20 backdrop-blur-sm border border-primary/30 text-primary text-[10px] sm:text-xs font-bold uppercase tracking-[0.15em] mb-3 sm:mb-4">
               {slide.type === "ad" ? slide.badge : slide.event?.min_price > 0 ? "Boletos disponibles" : "Próximamente"}
             </span>
 
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-black leading-[0.95] tracking-tight mb-3 sm:mb-4 text-white drop-shadow-lg">
+            {/* Título con sombra para legibilidad */}
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-black leading-[0.95] tracking-tight mb-3 sm:mb-4 text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
               {slide.type === "ad" ? slide.title : slide.event?.name}
             </h1>
 
-            {/* Descripción - CON FONDO PARA LEGIBILIDAD */}
-            <div className="bg-black/40 backdrop-blur-sm p-3 sm:p-4 rounded-xl border border-white/10 mb-4 sm:mb-6">
-              <p className="text-sm sm:text-base text-gray-200 max-w-xl leading-relaxed">
-                {slide.type === "ad" ? slide.description : slide.event?.description}
+            {/* Descripción - CON FONDO OSCURO Y BLUR */}
+            <div className="bg-black/50 backdrop-blur-md p-3 sm:p-4 rounded-xl border border-white/10 mb-3 sm:mb-4">
+              <p className="text-sm sm:text-base text-gray-200 max-w-xl leading-relaxed drop-shadow-sm">
+                {slide.type === "ad" 
+                  ? slide.description 
+                  : slide.event?.description?.length > 120 
+                    ? slide.event?.description?.slice(0, 120) + "..." 
+                    : slide.event?.description
+                }
               </p>
             </div>
 
+            {/* Fecha y ubicación - CON FONDO OSCURO */}
             {slide.type === "event" && (
-              <div className="bg-black/40 backdrop-blur-sm p-3 sm:p-4 rounded-xl border border-white/10 mb-4 sm:mb-6">
+              <div className="bg-black/50 backdrop-blur-md p-3 sm:p-4 rounded-xl border border-white/10 mb-4 sm:mb-6">
                 <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-xs sm:text-sm text-gray-300">
                   <div className="flex items-center gap-2">
                     <Calendar size={14} className="sm:size-4 text-secondary" />
-                    <span>
-                      {new Date(slide.event.start_date).toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "long" })}
+                    <span className="drop-shadow-sm">
+                      {new Date(slide.event.start_date).toLocaleDateString("es-MX", { 
+                        weekday: "long", 
+                        day: "numeric", 
+                        month: "long",
+                        year: "numeric"
+                      })}
                     </span>
                   </div>
                   {slide.event.location && (
                     <div className="flex items-center gap-2">
                       <MapPin size={14} className="sm:size-4 text-secondary" />
-                      <span>{slide.event.location}</span>
+                      <span className="drop-shadow-sm">{slide.event.location}</span>
+                    </div>
+                  )}
+                  {slide.event.start_time && (
+                    <div className="flex items-center gap-2">
+                      <Clock size={14} className="sm:size-4 text-secondary" />
+                      <span className="drop-shadow-sm">{slide.event.start_time}</span>
                     </div>
                   )}
                 </div>
               </div>
             )}
 
-            {/* Botones - MÁS GRANDES Y FÁCILES */}
+            {/* Botones - MÁS GRANDES Y CON MEJOR UX */}
             <div className="flex flex-wrap gap-3 sm:gap-4">
               <Link
                 href={slide.type === "ad" ? slide.link : `/events/${slide.event?.public_id}`}
-                className="inline-flex items-center gap-2 px-7 sm:px-9 py-4 sm:py-4.5 rounded-full bg-primary text-sm sm:text-base font-bold text-white hover:bg-primary/90 transition-all shadow-xl shadow-primary/30 hover:shadow-primary/50 hover:scale-105 active:scale-95 min-h-[52px] sm:min-h-[56px]"
+                className="inline-flex items-center gap-2 px-7 sm:px-9 py-4 sm:py-4.5 rounded-full bg-gradient-to-r from-primary to-primary/80 text-sm sm:text-base font-bold text-white hover:from-primary/90 hover:to-primary/70 transition-all shadow-xl shadow-primary/30 hover:shadow-primary/50 hover:scale-105 active:scale-95 min-h-[52px] sm:min-h-[56px]"
               >
-                {slide.type === "ad" ? slide.linkText : "Ver evento"}
+                {slide.type === "ad" ? slide.linkText : "Comprar boletos"}
                 <ArrowRight size={18} className="sm:size-5" />
               </Link>
               <Link
@@ -249,67 +279,69 @@ export const HeroSection = () => {
         </div>
 
         {/* ============================================================
-            PANEL DERECHO
+            PANEL DERECHO - EVENTO DESTACADO MEJORADO
         ============================================================ */}
         {featuredEvent && (
           <div className="flex flex-col gap-4 sm:gap-6">
-            <div className="glass-card overflow-hidden relative flex-1 min-h-[200px] sm:min-h-[280px]">
+            {/* Evento destacado - CON BOTONES MÁS GRANDES Y TEXTO LEGIBLE */}
+            <div className="glass-card overflow-hidden relative flex-1 min-h-[200px] sm:min-h-[280px] border border-white/10 hover:border-primary/20 transition-all duration-300">
               {featuredEvent.image_url && (
                 <div className="absolute inset-0">
                   <Image
                     src={featuredEvent.image_url}
                     alt={featuredEvent.name}
                     fill
-                    className="object-cover opacity-30"
+                    className="object-cover opacity-25"
                     sizes="(max-width: 768px) 100vw, 33vw"
                   />
                 </div>
               )}
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.08] to-secondary/[0.06]" />
-              <div className="relative z-10 p-5 sm:p-8 h-full flex flex-col justify-between">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.06] to-secondary/[0.04]" />
+              <div className="relative z-10 p-5 sm:p-7 h-full flex flex-col justify-between">
                 <div>
-                  <span className="badge badge-hot text-[10px] sm:text-xs">DESTACADO</span>
-                  <h3 className="text-base sm:text-xl font-black mt-3 sm:mt-4 line-clamp-2">{featuredEvent.name}</h3>
-                  <div className="mt-3 sm:mt-4 space-y-2 text-xs sm:text-sm text-muted">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="badge badge-hot text-[10px] sm:text-xs">DESTACADO</span>
+                    {featuredEvent.min_price > 0 && (
+                      <span className="text-[10px] sm:text-xs text-primary font-bold">
+                        ${featuredEvent.min_price.toLocaleString("es-MX")}
+                      </span>
+                    )}
+                  </div>
+                  <h3 className="text-base sm:text-lg font-black text-white line-clamp-2 drop-shadow-md">
+                    {featuredEvent.name}
+                  </h3>
+                  <div className="mt-2 space-y-1.5 text-xs sm:text-sm text-gray-300">
                     <div className="flex items-center gap-2">
-                      <Calendar size={12} className="sm:size-4 text-secondary" />
-                      <span className="line-clamp-1">{formattedDate}</span>
+                      <Calendar size={12} className="sm:size-3.5 text-secondary flex-shrink-0" />
+                      <span className="line-clamp-1 drop-shadow-sm">{formattedDate}</span>
                     </div>
                     {featuredEvent.location && (
                       <div className="flex items-center gap-2">
-                        <MapPin size={12} className="sm:size-4 text-secondary" />
-                        <span className="line-clamp-1">{featuredEvent.location}</span>
+                        <MapPin size={12} className="sm:size-3.5 text-secondary flex-shrink-0" />
+                        <span className="line-clamp-1 drop-shadow-sm">{featuredEvent.location}</span>
                       </div>
                     )}
                   </div>
                 </div>
-                <div className="flex items-center justify-between mt-4 sm:mt-6">
-                  <div>
-                    {featuredEvent.min_price > 0 ? (
-                      <>
-                        <p className="text-[10px] sm:text-xs text-muted-dark">Desde</p>
-                        <p className="text-xl sm:text-2xl font-black text-primary">
-                          ${featuredEvent.min_price.toLocaleString("es-MX")}
-                        </p>
-                      </>
-                    ) : (
-                      <p className="text-xs sm:text-sm text-muted-dark">Consulta disponibilidad</p>
-                    )}
-                  </div>
+                
+                {/* Botón más grande */}
+                <div className="mt-4 sm:mt-5">
                   <Link
                     href={`/events/${featuredEvent.public_id}`}
-                    className="px-5 sm:px-6 py-2.5 sm:py-3 rounded-full bg-primary text-sm font-bold text-white hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 hover:scale-105 active:scale-95"
+                    className="flex items-center justify-center gap-2 w-full px-4 py-3 sm:py-3.5 rounded-full bg-gradient-to-r from-primary to-primary/80 text-sm font-bold text-white hover:from-primary/90 hover:to-primary/70 transition-all shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:scale-[1.02] active:scale-95 min-h-[44px] sm:min-h-[48px]"
                   >
-                    Ver
+                    Ver evento
+                    <ArrowRight size={16} />
                   </Link>
                 </div>
               </div>
             </div>
 
-            <div className="glass-card p-5 sm:p-8 relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-secondary/[0.06] to-primary/[0.04]" />
+            {/* Noticias - CON BOTÓN MÁS GRANDE */}
+            <div className="glass-card p-5 sm:p-7 relative overflow-hidden border border-white/10">
+              <div className="absolute inset-0 bg-gradient-to-br from-secondary/[0.04] to-primary/[0.02]" />
               <div className="relative z-10">
-                <h3 className="text-base sm:text-lg font-black">Noticias osmi</h3>
+                <h3 className="text-base sm:text-lg font-black text-white">Noticias osmi</h3>
                 <div className="mt-3 sm:mt-4 space-y-2 sm:space-y-3">
                   {events.slice(0, 3).map((e, i) => (
                     <Link
@@ -317,11 +349,11 @@ export const HeroSection = () => {
                       href={`/events/${e.public_id}`}
                       className="flex items-center gap-3 p-2 rounded-xl hover:bg-white/[0.04] transition-all group"
                     >
-                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-white/[0.04] flex items-center justify-center text-xs font-bold text-primary shrink-0">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-white/[0.04] flex items-center justify-center text-xs font-bold text-primary shrink-0 group-hover:bg-primary/10 transition-colors">
                         {i + 1}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs sm:text-sm font-semibold truncate group-hover:text-primary transition-colors">
+                        <p className="text-xs sm:text-sm font-semibold truncate group-hover:text-primary transition-colors text-white">
                           {e.name}
                         </p>
                         <p className="text-[10px] sm:text-xs text-muted-dark truncate">
@@ -333,7 +365,7 @@ export const HeroSection = () => {
                 </div>
                 <Link
                   href="/events"
-                  className="block w-full text-center mt-4 sm:mt-6 py-3 sm:py-3.5 rounded-full bg-primary text-sm font-bold text-white hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95"
+                  className="block w-full text-center mt-4 sm:mt-5 py-3 sm:py-3.5 rounded-full bg-white/5 border border-white/10 text-sm font-bold text-white hover:bg-white/10 hover:border-primary/30 transition-all hover:scale-[1.02] active:scale-95"
                 >
                   Ver todos los eventos
                 </Link>
