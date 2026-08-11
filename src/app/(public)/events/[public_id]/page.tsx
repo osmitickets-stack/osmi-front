@@ -111,8 +111,8 @@ export default async function EventPage({
     }
   );
 
-  const isDesfragmentado = event.name?.toLowerCase().includes("desfragmentado") ||
-                          event.slug?.includes("desfragmentado");
+  // CORREGIDO: solo usar name, slug no existe en NormalizedEvent
+  const isDesfragmentado = event.name?.toLowerCase().includes("desfragmentado");
 
   return (
     <div className="min-h-screen flex flex-col bg-black">
