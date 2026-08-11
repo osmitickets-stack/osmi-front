@@ -59,117 +59,253 @@ body {
   min-height: 100vh;
 }
 
-/* Glass card */
+/* =========================
+   LAYOUT GLOBAL - ELIMINA MÁRGENES LATERALES FEOS
+========================= */
+
+/* Contenedor principal para todas las páginas */
+.main-content {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  width: 100%;
+}
+
+/* Para secciones que necesitan fondo completo */
+.section-full {
+  width: 100%;
+  padding: 4rem 1.5rem;
+}
+
+/* Para que el contenido interno tenga el ancho correcto */
+.section-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* =========================
+   GLASS CARD MEJORADO
+========================= */
+
 .glass-card {
   background: var(--glass);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--card-border);
   border-radius: var(--radius);
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
 }
 
-/* Glow effects */
-.glow-primary {
-  box-shadow: 0 0 20px rgba(255, 43, 214, 0.35), 0 0 60px rgba(123, 97, 255, 0.15);
+/* Efecto de brillo en hover */
+.glass-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(255,43,214,0.1), transparent, rgba(0,209,255,0.1));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
 }
-.glow-hover:hover {
-  box-shadow: 0 0 30px rgba(255, 43, 214, 0.5), 0 0 80px rgba(123, 97, 255, 0.25);
+
+.glass-card:hover::before {
+  opacity: 1;
+}
+
+.glass-card:hover {
+  border-color: rgba(255, 43, 214, 0.15);
   transform: translateY(-2px);
+  box-shadow: 0 8px 40px rgba(255, 43, 214, 0.08);
 }
 
-/* Text gradient */
-.text-gradient {
-  background: linear-gradient(to right, #ff2bd6, #7b61ff, #00d1ff);
+/* =========================
+   EFECTOS NEÓN PREMIUM
+========================= */
+
+/* Glow primario (rosa) */
+.glow-primary {
+  box-shadow: 0 0 30px rgba(255, 43, 214, 0.25), 0 0 60px rgba(123, 97, 255, 0.1);
+}
+
+/* Glow secundario (morado) */
+.glow-secondary {
+  box-shadow: 0 0 30px rgba(123, 97, 255, 0.25), 0 0 60px rgba(255, 43, 214, 0.1);
+}
+
+/* Glow acento (celeste) */
+.glow-accent {
+  box-shadow: 0 0 30px rgba(0, 209, 255, 0.25), 0 0 60px rgba(123, 97, 255, 0.1);
+}
+
+/* Hover glow en cards */
+.glow-hover:hover {
+  box-shadow: 0 0 40px rgba(255, 43, 214, 0.35), 0 0 80px rgba(123, 97, 255, 0.2);
+  transform: translateY(-3px);
+}
+
+/* Borde neón animado */
+.border-neon {
+  position: relative;
+  border: 1px solid transparent;
+  background-clip: padding-box;
+}
+
+.border-neon::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, #ff2bd6, #7b61ff, #00d1ff, #ff2bd6);
+  background-size: 300% 300%;
+  animation: neon-border 3s ease-in-out infinite;
+  z-index: -1;
+  padding: 1px;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+@keyframes neon-border {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* =========================
+   TIPOGRAFÍA MEJORADA
+========================= */
+
+/* Títulos con gradiente neón */
+.title-gradient {
+  background: linear-gradient(135deg, #ff2bd6, #7b61ff, #00d1ff);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  background-size: 200% 200%;
+  animation: gradient-shift 4s ease-in-out infinite;
 }
 
-/* Hero grid */
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Subtítulos con efecto sutil */
+.subtitle-glow {
+  color: var(--muted);
+  font-weight: 300;
+  letter-spacing: 0.05em;
+  text-shadow: 0 0 40px rgba(123, 97, 255, 0.1);
+}
+
+/* Texto con efecto neón */
+.text-neon {
+  color: #ff2bd6;
+  text-shadow: 
+    0 0 10px rgba(255, 43, 214, 0.3),
+    0 0 20px rgba(255, 43, 214, 0.15),
+    0 0 40px rgba(255, 43, 214, 0.05);
+}
+
+/* =========================
+   HERO GRID
+========================= */
+
 .hero-grid {
   background-image:
     linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
   background-size: 40px 40px;
   mask-image: radial-gradient(ellipse at center, black 60%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 60%, transparent 100%);
 }
 
-/* Fade effects */
-.fade-bottom {
-  mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
-}
-.fade-in {
-  animation: fadeIn 0.5s ease forwards;
-}
+/* =========================
+   BOTONES PREMIUM
+========================= */
 
-/* Button base */
 .btn-primary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
   border-radius: 9999px;
-  background: var(--primary);
+  background: linear-gradient(135deg, #ff2bd6, #7b61ff);
   padding: 0.75rem 2rem;
   font-size: 0.875rem;
   font-weight: 700;
   color: white;
-  box-shadow: 0 0 20px rgba(255, 43, 214, 0.35);
-  transition: all 0.3s ease;
+  box-shadow: 0 0 30px rgba(255, 43, 214, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   border: none;
+  position: relative;
+  overflow: hidden;
 }
+
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #7b61ff, #00d1ff);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: inherit;
+}
+
+.btn-primary:hover::after {
+  opacity: 1;
+}
+
 .btn-primary:hover {
-  background: rgba(255, 43, 214, 0.9);
-  box-shadow: 0 0 30px rgba(255, 43, 214, 0.5);
-  transform: translateY(-1px);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 0 50px rgba(255, 43, 214, 0.4);
 }
+
 .btn-primary:active {
   transform: scale(0.97);
 }
-.btn-primary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
+
+.btn-primary > * {
+  position: relative;
+  z-index: 1;
 }
 
+/* Botón secundario */
 .btn-secondary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
   border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.03);
   padding: 0.75rem 2rem;
   font-size: 0.875rem;
   font-weight: 600;
   color: var(--foreground);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   transition: all 0.3s ease;
   cursor: pointer;
+  backdrop-filter: blur(10px);
 }
+
 .btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 43, 214, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(255, 43, 214, 0.05);
 }
 
-/* Animations */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(255, 43, 214, 0.35); }
-  50% { box-shadow: 0 0 40px rgba(255, 43, 214, 0.6); }
-}
+/* =========================
+   BADGES
+========================= */
 
-/* Scrollbar premium */
-::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: var(--background-secondary); }
-::-webkit-scrollbar-thumb { background: var(--muted-dark); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: var(--secondary); }
-
-/* Badge */
 .badge {
   display: inline-flex;
   align-items: center;
@@ -179,101 +315,201 @@ body {
   font-size: 0.75rem;
   font-weight: 600;
 }
-.badge-new { background: rgba(0, 209, 255, 0.2); color: var(--accent); }
-.badge-hot { background: rgba(255, 43, 214, 0.2); color: var(--primary); }
-.badge-soon { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+.badge-new { background: rgba(0, 209, 255, 0.15); color: var(--accent); border: 1px solid rgba(0, 209, 255, 0.2); }
+.badge-hot { background: rgba(255, 43, 214, 0.15); color: var(--primary); border: 1px solid rgba(255, 43, 214, 0.2); }
+.badge-soon { background: rgba(245, 158, 11, 0.15); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.2); }
+.badge-premium { background: linear-gradient(135deg, rgba(255,43,214,0.15), rgba(123,97,255,0.15)); color: #ff2bd6; border: 1px solid rgba(255,43,214,0.2); }
 
 /* =========================
-   OSMI PROFESSIONAL UI SYSTEM
+   SCROLLBAR PREMIUM
 ========================= */
 
-/* Search bar */
-.search-bar {
-  width: 100%;
-  height: 56px;
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  background: rgba(255, 255, 255, 0.03);
-  padding: 0 20px 0 52px;
-  font-size: 14px;
-  color: var(--foreground);
-  outline: none;
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--background-secondary); }
+::-webkit-scrollbar-thumb { 
+  background: linear-gradient(to bottom, #ff2bd6, #7b61ff);
+  border-radius: 4px; 
+}
+::-webkit-scrollbar-thumb:hover { background: var(--secondary); }
+
+/* =========================
+   ANIMACIONES
+========================= */
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 30px rgba(255, 43, 214, 0.25); }
+  50% { box-shadow: 0 0 60px rgba(255, 43, 214, 0.4); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes marquee {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+
+@keyframes neon-border {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* =========================
+   CLASES DE ANIMACIÓN
+========================= */
+
+.animate-fade-in { animation: fadeIn 0.5s ease forwards; }
+.animate-fade-in-up { animation: fadeInUp 0.6s ease-out forwards; }
+.animate-float { animation: float 3s ease-in-out infinite; }
+.animate-pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }
+.animate-marquee {
+  display: flex;
+  animation: marquee 25s linear infinite;
+  width: max-content;
+}
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 640px) {
+  .main-content {
+    padding: 1rem 1rem;
+  }
+  
+  .section-full {
+    padding: 2rem 1rem;
+  }
+  
+  .animate-marquee {
+    animation-duration: 15s;
+  }
+  
+  .btn-primary, .btn-secondary {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.8rem;
+  }
+  
+  .hero-stat {
+    font-size: 28px;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .main-content {
+    padding: 1.5rem 2rem;
+  }
+}
+
+/* =========================
+   UTILIDADES ADICIONALES
+========================= */
+
+/* Separadores decorativos */
+.divider-gradient {
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(255,43,214,0.2), rgba(123,97,255,0.2), transparent);
+}
+
+/* Fondo con textura sutil */
+.bg-texture {
+  background-image: 
+    radial-gradient(circle at 20% 50%, rgba(255,43,214,0.03) 0%, transparent 50%),
+    radial-gradient(circle at 80% 50%, rgba(123,97,255,0.03) 0%, transparent 50%);
+}
+
+/* Efecto de brillo en hover */
+.hover-glow {
   transition: all 0.3s ease;
 }
-.search-bar:focus {
-  border-color: rgba(255, 43, 214, 0.3);
-  background: rgba(255, 255, 255, 0.05);
-  box-shadow: 0 0 30px rgba(255, 43, 214, 0.08);
-}
-.search-bar::placeholder {
-  color: var(--muted-dark);
+.hover-glow:hover {
+  box-shadow: 0 0 40px rgba(255, 43, 214, 0.08);
+  border-color: rgba(255, 43, 214, 0.15);
 }
 
-/* Hero badge profesional */
-.hero-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 8px 16px;
-  border-radius: 999px;
-  background: rgba(255, 43, 214, 0.12);
-  border: 1px solid rgba(255, 43, 214, 0.2);
-  color: #ff4ddd;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
+/* Máscara de desvanecimiento */
+.fade-bottom {
+  mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
 }
 
-/* Hero stat */
-.hero-stat {
-  font-size: 38px;
-  font-weight: 900;
-  line-height: 1;
-  background: linear-gradient(to right, #ff2bd6, #7b61ff);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-.hero-stat-label {
-  color: var(--muted-dark);
-  margin-top: 6px;
-  font-size: 13px;
-  font-weight: 500;
-}
+/* =========================
+   ESTILOS PARA PÁGINA DEL TALLER Y ARTISTA
+========================= */
 
-/* Event card premium */
-.event-card-premium {
-  overflow: hidden;
-  border-radius: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+/* Tarjetas de servicio */
+.service-card {
   background: rgba(255, 255, 255, 0.02);
-  transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
-}
-.event-card-premium:hover {
-  transform: translateY(-4px);
-  border-color: rgba(255, 43, 214, 0.2);
-  box-shadow: 0 20px 60px rgba(255, 43, 214, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 20px;
+  padding: 2rem;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
 }
 
-/* Countdown block */
-.countdown-block {
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  padding: 12px;
-  text-align: center;
-  min-width: 60px;
+.service-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(from 0deg, transparent, rgba(255,43,214,0.03), transparent, rgba(123,97,255,0.03), transparent);
+  animation: spin 10s linear infinite;
+  opacity: 0;
+  transition: opacity 0.4s ease;
 }
-.countdown-number {
-  font-size: 24px;
-  font-weight: 900;
-  color: var(--foreground);
-  line-height: 1;
+
+.service-card:hover::before {
+  opacity: 1;
 }
-.countdown-label {
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  color: var(--muted-dark);
-  margin-top: 4px;
+
+.service-card:hover {
+  border-color: rgba(255, 43, 214, 0.15);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
 }
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* =========================
+   EFECTOS DE ENTRADA PARA SECCIONES
+========================= */
+
+.section-enter {
+  opacity: 0;
+  transform: translateY(30px);
+  animation: fadeInUp 0.8s ease forwards;
+}
+
+.section-enter:nth-child(1) { animation-delay: 0.1s; }
+.section-enter:nth-child(2) { animation-delay: 0.2s; }
+.section-enter:nth-child(3) { animation-delay: 0.3s; }
+.section-enter:nth-child(4) { animation-delay: 0.4s; }
+.section-enter:nth-child(5) { animation-delay: 0.5s; }
