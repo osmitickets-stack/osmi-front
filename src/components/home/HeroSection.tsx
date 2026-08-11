@@ -10,7 +10,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Clock,
-  Users,
 } from "lucide-react";
 
 import { api } from "@/lib/api";
@@ -78,15 +77,7 @@ export const HeroSection = () => {
     fetchEvents();
   }, []);
 
-  // Buscar el evento de Desfragmentado específicamente
-  const desfragmentadoEvent = events.find(
-    (e) => e.name?.toLowerCase().includes("desfragmentado") || 
-           e.slug?.includes("desfragmentado") ||
-           e.organizer?.toLowerCase().includes("desfragmentado")
-  );
-
-  // Usar el evento de Desfragmentado como destacado si existe, si no el primero
-  const featuredEvent = desfragmentadoEvent || events.find((e) => e.image_url) || events[0] || null;
+  const featuredEvent = events.find((e) => e.image_url) || events[0] || null;
 
   const allSlides = [
     ...AD_SLIDES.map((ad) => ({ type: "ad" as const, ...ad })),
@@ -133,9 +124,7 @@ export const HeroSection = () => {
     <section className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 pb-4">
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6 sm:gap-8">
 
-        {/* ============================================================
-            CARRUSEL
-        ============================================================ */}
+        {/* ==================== CARRUSEL ==================== */}
         <div className="relative overflow-hidden rounded-[30px] sm:rounded-[40px] border border-white/[0.06] min-h-[400px] sm:min-h-[520px] lg:min-h-[600px] flex items-end group">
           
           <div className="absolute inset-0 transition-opacity duration-700">
@@ -162,11 +151,11 @@ export const HeroSection = () => {
             )}
           </div>
 
-          {/* Gradientes mejorados para legibilidad */}
+          {/* Gradientes */}
           <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
 
-          {/* Indicadores arriba */}
+          {/* Indicadores */}
           {allSlides.length > 1 && (
             <div className="absolute top-4 sm:top-6 left-1/2 -translate-x-1/2 z-20 flex gap-1.5 sm:gap-2">
               {allSlides.map((_, i) => (
@@ -184,7 +173,7 @@ export const HeroSection = () => {
             </div>
           )}
 
-          {/* Flechas - MÁS GRANDES Y VISIBLES */}
+          {/* Flechas */}
           {allSlides.length > 1 && (
             <>
               <button
@@ -204,19 +193,16 @@ export const HeroSection = () => {
             </>
           )}
 
-          {/* CONTENIDO - CENTRADO CON BUEN ESPACIO */}
+          {/* Contenido */}
           <div className="relative z-10 p-6 sm:p-8 lg:p-10 xl:p-14 w-full max-w-2xl">
-            {/* Badge con borde neón */}
             <span className="inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-primary/20 backdrop-blur-sm border border-primary/30 text-primary text-[10px] sm:text-xs font-bold uppercase tracking-[0.15em] mb-3 sm:mb-4">
               {slide.type === "ad" ? slide.badge : slide.event?.min_price > 0 ? "Boletos disponibles" : "Próximamente"}
             </span>
 
-            {/* Título con sombra para legibilidad */}
             <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-black leading-[0.95] tracking-tight mb-3 sm:mb-4 text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
               {slide.type === "ad" ? slide.title : slide.event?.name}
             </h1>
 
-            {/* Descripción - CON FONDO OSCURO Y BLUR */}
             <div className="bg-black/50 backdrop-blur-md p-3 sm:p-4 rounded-xl border border-white/10 mb-3 sm:mb-4">
               <p className="text-sm sm:text-base text-gray-200 max-w-xl leading-relaxed drop-shadow-sm">
                 {slide.type === "ad" 
@@ -228,7 +214,6 @@ export const HeroSection = () => {
               </p>
             </div>
 
-            {/* Fecha y ubicación - CON FONDO OSCURO */}
             {slide.type === "event" && (
               <div className="bg-black/50 backdrop-blur-md p-3 sm:p-4 rounded-xl border border-white/10 mb-4 sm:mb-6">
                 <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-xs sm:text-sm text-gray-300">
@@ -249,17 +234,10 @@ export const HeroSection = () => {
                       <span className="drop-shadow-sm">{slide.event.location}</span>
                     </div>
                   )}
-                  {slide.event.start_time && (
-                    <div className="flex items-center gap-2">
-                      <Clock size={14} className="sm:size-4 text-secondary" />
-                      <span className="drop-shadow-sm">{slide.event.start_time}</span>
-                    </div>
-                  )}
                 </div>
               </div>
             )}
 
-            {/* Botones - MÁS GRANDES Y CON MEJOR UX */}
             <div className="flex flex-wrap gap-3 sm:gap-4">
               <Link
                 href={slide.type === "ad" ? slide.link : `/events/${slide.event?.public_id}`}
@@ -278,12 +256,9 @@ export const HeroSection = () => {
           </div>
         </div>
 
-        {/* ============================================================
-            PANEL DERECHO - EVENTO DESTACADO MEJORADO
-        ============================================================ */}
+        {/* ==================== PANEL DERECHO ==================== */}
         {featuredEvent && (
           <div className="flex flex-col gap-4 sm:gap-6">
-            {/* Evento destacado - CON BOTONES MÁS GRANDES Y TEXTO LEGIBLE */}
             <div className="glass-card overflow-hidden relative flex-1 min-h-[200px] sm:min-h-[280px] border border-white/10 hover:border-primary/20 transition-all duration-300">
               {featuredEvent.image_url && (
                 <div className="absolute inset-0">
@@ -324,7 +299,6 @@ export const HeroSection = () => {
                   </div>
                 </div>
                 
-                {/* Botón más grande */}
                 <div className="mt-4 sm:mt-5">
                   <Link
                     href={`/events/${featuredEvent.public_id}`}
@@ -337,7 +311,6 @@ export const HeroSection = () => {
               </div>
             </div>
 
-            {/* Noticias - CON BOTÓN MÁS GRANDE */}
             <div className="glass-card p-5 sm:p-7 relative overflow-hidden border border-white/10">
               <div className="absolute inset-0 bg-gradient-to-br from-secondary/[0.04] to-primary/[0.02]" />
               <div className="relative z-10">

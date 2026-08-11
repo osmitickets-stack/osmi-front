@@ -2,9 +2,10 @@
 
 import { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cache } from "react";
-import { Calendar, MapPin, Clock, Users, Music, Sparkles, ArrowRight, Share2, Heart } from "lucide-react";
+import { Calendar, MapPin, Clock, Users, Sparkles, ArrowRight, Share2, Heart } from "lucide-react";
 
 import EventMapWrapper from "@/components/events/EventMapWrapper";
 import BuyTicketCard from "@/components/events/BuyTicketCard";
@@ -110,7 +111,6 @@ export default async function EventPage({
     }
   );
 
-  // Determinar si es el evento de Desfragmentado
   const isDesfragmentado = event.name?.toLowerCase().includes("desfragmentado") ||
                           event.slug?.includes("desfragmentado");
 
@@ -118,9 +118,7 @@ export default async function EventPage({
     <div className="min-h-screen flex flex-col bg-black">
       <Navbar />
 
-      {/* ============================================================
-          HERO - MEJORADO
-      ============================================================ */}
+      {/* ==================== HERO ==================== */}
       <div className="relative w-full h-[50vh] md:h-[60vh] lg:h-[70vh] overflow-hidden">
         {event.image_url ? (
           <>
@@ -134,8 +132,6 @@ export default async function EventPage({
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
             <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-black/40" />
-            
-            {/* Efecto de brillo */}
             <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
           </>
         ) : (
@@ -146,7 +142,6 @@ export default async function EventPage({
           </div>
         )}
 
-        {/* INFO SOBRE EL HERO - MEJORADA */}
         <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 md:p-12 z-10">
           <div className="max-w-4xl">
             <div className="flex flex-wrap items-center gap-3 mb-4">
@@ -184,7 +179,6 @@ export default async function EventPage({
           </div>
         </div>
 
-        {/* Botones de acción flotantes */}
         <div className="absolute top-4 right-4 z-20 flex gap-2">
           <button className="w-10 h-10 rounded-full bg-black/50 backdrop-blur-md border border-white/10 flex items-center justify-center text-white hover:bg-black/70 hover:border-primary/30 transition-all">
             <Heart size={18} />
@@ -195,18 +189,14 @@ export default async function EventPage({
         </div>
       </div>
 
-      {/* ============================================================
-          CONTENIDO PRINCIPAL
-      ============================================================ */}
+      {/* ==================== CONTENIDO ==================== */}
       <div className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 w-full">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
           
-          {/* COLUMNA IZQUIERDA */}
           <div className="lg:col-span-2 space-y-8">
             
-            {/* DESCRIPCIÓN - MEJORADA */}
             {event.description && (
-              <section className="glass-card p-6 sm:p-8 border border-white/10">
+              <div className="glass-card p-6 sm:p-8 border border-white/10">
                 <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 flex items-center gap-2">
                   <Sparkles size={20} className="text-primary" />
                   Sobre el evento
@@ -214,11 +204,10 @@ export default async function EventPage({
                 <div className="text-gray-300 leading-relaxed whitespace-pre-wrap">
                   {event.description}
                 </div>
-              </section>
+              </div>
             )}
 
-            {/* LINEUP - MEJORADO */}
-            <section className="glass-card p-6 sm:p-8 border border-white/10">
+            <div className="glass-card p-6 sm:p-8 border border-white/10">
               <h2 className="text-xl sm:text-2xl font-bold text-white mb-6 flex items-center gap-2">
                 <Users size={20} className="text-secondary" />
                 Lineup
@@ -236,10 +225,9 @@ export default async function EventPage({
                   </p>
                 </div>
               </div>
-            </section>
+            </div>
 
-            {/* UBICACIÓN - MEJORADA */}
-            <section className="glass-card p-6 sm:p-8 border border-white/10 overflow-hidden">
+            <div className="glass-card p-6 sm:p-8 border border-white/10 overflow-hidden">
               <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 flex items-center gap-2">
                 <MapPin size={20} className="text-accent" />
                 Ubicación
@@ -255,10 +243,9 @@ export default async function EventPage({
                   longitude={event.longitude ?? -103.3811}
                 />
               </div>
-            </section>
+            </div>
           </div>
 
-          {/* COLUMNA DERECHA - TICKETS MEJORADA */}
           <div className="lg:col-span-1">
             <div className="sticky top-24">
               <BuyTicketCard
@@ -273,9 +260,7 @@ export default async function EventPage({
         </div>
       </div>
 
-      {/* ============================================================
-          EVENTOS RELACIONADOS - MEJORADOS
-      ============================================================ */}
+      {/* ==================== RELACIONADOS ==================== */}
       <section className="border-t border-white/5 bg-background-secondary/30 py-12 sm:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-8">
@@ -289,7 +274,6 @@ export default async function EventPage({
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
-            {/* Tienda Física */}
             <a
               href="/tienda"
               className="glass-card overflow-hidden group hover:glow-primary transition-all border border-white/10 hover:border-primary/20"
@@ -317,7 +301,6 @@ export default async function EventPage({
               </div>
             </a>
 
-            {/* Escuela de Arte */}
             <a
               href="/escuela-arte"
               className="glass-card overflow-hidden group hover:glow-primary transition-all border border-white/10 hover:border-primary/20"
@@ -345,7 +328,6 @@ export default async function EventPage({
               </div>
             </a>
 
-            {/* Escuela de Tatuaje */}
             <a
               href="/escuela-tatuaje"
               className="glass-card overflow-hidden group hover:glow-primary transition-all border border-white/10 hover:border-primary/20"

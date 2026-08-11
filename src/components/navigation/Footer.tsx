@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Instagram, Twitter, Youtube, Music, MessageCircle } from "lucide-react";
+import { Instagram, Twitter, YouTube, Music, MessageCircle } from "lucide-react";
 
 export const Footer = () => {
   return (
@@ -7,6 +7,7 @@ export const Footer = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
         {/* Grid principal */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 sm:gap-10">
+          
           {/* Marca */}
           <div className="col-span-2 md:col-span-1 space-y-4">
             <Link href="/" className="text-2xl font-black text-gradient tracking-tight">
@@ -30,7 +31,9 @@ export const Footer = () => {
                 rel="noopener noreferrer"
                 className="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center text-muted-dark hover:text-primary hover:bg-white/10 transition-all"
               >
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                </svg>
               </a>
               <a 
                 href="https://youtube.com" 
@@ -38,7 +41,7 @@ export const Footer = () => {
                 rel="noopener noreferrer"
                 className="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center text-muted-dark hover:text-primary hover:bg-white/10 transition-all"
               >
-                <Youtube size={16} />
+                <YouTube size={16} />
               </a>
               <a 
                 href="https://open.spotify.com" 

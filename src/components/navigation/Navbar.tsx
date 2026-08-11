@@ -33,12 +33,12 @@ export const Navbar = () => {
     <header className="sticky top-0 z-50 w-full border-b border-white/[0.06] bg-background/80 backdrop-blur-2xl">
       <div className="mx-auto flex items-center h-16 px-4 sm:px-6 lg:px-8 max-w-[1400px] gap-4 lg:gap-6">
         
-        {/* Logo - CON ESTILO */}
+        {/* ======================== LOGO ======================== */}
         <Link href="/" className="text-2xl font-black text-gradient shrink-0 tracking-tight">
           osmi
         </Link>
 
-        {/* Search - CORREGIDO (lupa no encima del texto) */}
+        {/* ======================== SEARCH ======================== */}
         <div className="hidden lg:flex flex-1 max-w-[420px] relative">
           <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-dark pointer-events-none">
             <Search size={16} />
@@ -50,7 +50,7 @@ export const Navbar = () => {
           />
         </div>
 
-        {/* Navegacion */}
+        {/* ======================== NAVEGACIÓN ======================== */}
         <nav className="hidden lg:flex items-center gap-1">
           <Link 
             href="/events" 
@@ -84,7 +84,7 @@ export const Navbar = () => {
           </Link>
         </nav>
 
-        {/* Auth - BOTONES MÁS GRANDES */}
+        {/* ======================== AUTH ======================== */}
         <div className="hidden lg:flex items-center gap-3 shrink-0">
           {isLoggedIn ? (
             <>
@@ -121,7 +121,7 @@ export const Navbar = () => {
           )}
         </div>
 
-        {/* Mobile toggle */}
+        {/* ======================== MOBILE TOGGLE ======================== */}
         <button 
           className="lg:hidden text-foreground p-2 ml-auto" 
           onClick={() => setMobileOpen(!mobileOpen)}
@@ -131,7 +131,7 @@ export const Navbar = () => {
         </button>
       </div>
 
-      {/* Mobile menu */}
+      {/* ======================== MOBILE MENU ======================== */}
       {mobileOpen && (
         <div className="lg:hidden border-t border-white/[0.06] bg-background/95 backdrop-blur-2xl px-6 py-5 space-y-4 fade-in">
           <div className="relative">
