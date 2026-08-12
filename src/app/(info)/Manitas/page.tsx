@@ -335,7 +335,7 @@ export default function ManitasPage() {
                     </div>
                     <div>
                       <h4 className="text-slate-800 font-bold text-sm">Dirección</h4>
-                      <p className="text-slate-600 text-sm">Guadalajara, Jalisco, México</p>
+                      <p className="text-slate-600 text-sm">Zapopan, Jalisco, México</p>
                     </div>
                   </div>
                   
@@ -449,9 +449,9 @@ export default function ManitasPage() {
             </div>
             
             <blockquote className="text-3xl md:text-5xl font-bold text-white leading-tight">
-              "Tu vehículo en las mejores manos. <br />
+              "Tu vehículo en las mejores Manitas. <br />
               <span className="bg-gradient-to-r from-blue-400 via-orange-400 to-blue-400 bg-clip-text text-transparent">
-                Manitas, confianza que se siente."
+                Confianza que se siente."
               </span>
             </blockquote>
             

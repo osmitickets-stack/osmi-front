@@ -35,7 +35,7 @@ export const Navbar = () => {
         
         {/* ======================== LOGO ======================== */}
         <Link href="/" className="text-2xl font-black text-gradient shrink-0 tracking-tight">
-          osmi
+          ★ MyOsmi ★
         </Link>
 
         {/* ======================== SEARCH ======================== */}
@@ -60,7 +60,7 @@ export const Navbar = () => {
                 : "text-muted hover:text-foreground hover:bg-white/[0.03]"
             }`}
           >
-            Explorar
+            Explorar           
           </Link>
           <Link 
             href="/events" 
@@ -70,7 +70,7 @@ export const Navbar = () => {
                 : "text-muted hover:text-foreground hover:bg-white/[0.03]"
             }`}
           >
-            Categorías
+            Categorías         
           </Link>
           <Link 
             href="/para-organizadores" 
@@ -109,7 +109,7 @@ export const Navbar = () => {
                 href="/login" 
                 className="px-5 py-2.5 rounded-xl text-sm font-medium text-muted hover:text-foreground hover:bg-white/[0.03] transition-colors border border-white/[0.06]"
               >
-                Iniciar Sesión
+                Iniciar Sesión           
               </Link>
               <Link 
                 href="/register" 

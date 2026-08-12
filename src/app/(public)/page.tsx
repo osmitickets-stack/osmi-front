@@ -14,27 +14,27 @@ import { normalizeEvent, type NormalizedEvent } from "@/modules/events/utils/nor
 // METADATA MEJORADA PARA SEO PREMIUM
 // ============================================================
 export const metadata = {
-  title: "osmi | Boletos para conciertos, deportes y eventos | Compra segura",
+  title: "MyOsmi | Boletos para conciertos, deportes y eventos | Compra segura",
   description: "Compra boletos para conciertos, deportes, teatro y festivales. osmi es la plataforma de ticketing más inteligente con entrega inmediata y soporte 24/7.",
   keywords: "boletos, conciertos, deportes, teatro, festivales, ticketing, eventos, osmi, compra de boletos, experiencias",
   openGraph: {
-    title: "osmi | Boletos para conciertos, deportes y eventos",
+    title: "MyOsmi | Boletos para conciertos, deportes y eventos",
     description: "Compra boletos seguros para los mejores eventos. Entrega inmediata y soporte 24/7.",
     type: "website",
     locale: "es_MX",
-    siteName: "osmi",
+    siteName: "MyOsmi",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "osmi - Boletos para eventos",
+        alt: "MyOsmi - Boletos para eventos",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "osmi | Boletos para eventos",
+    title: "MyOsmi | Boletos para eventos",
     description: "Compra boletos seguros para los mejores eventos.",
     images: ["/og-image.png"],
   },
@@ -185,7 +185,7 @@ export default async function HomePage() {
 
             <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16">
               {/* Marcas con efecto glow en hover */}
-              {["Alas Wings", "Desfragmentado", "El País", "TechCrunch", "Forbes"].map((brand) => (
+              {["Alas Wings", "Desfragmentado", "El País"].map((brand) => (
                 <span
                   key={brand}
                   className="text-lg md:text-2xl font-bold text-muted-dark/50 hover:text-muted hover:scale-105 transition-all duration-300 cursor-default"
@@ -198,7 +198,7 @@ export default async function HomePage() {
             {/* Estadísticas de confianza */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-12">
               <div className="glass-card p-6 text-center">
-                <div className="text-3xl md:text-4xl font-black text-gradient">25K+</div>
+                <div className="text-3xl md:text-4xl font-black text-gradient">25+</div>
                 <p className="text-xs text-muted mt-1">Eventos realizados</p>
               </div>
               <div className="glass-card p-6 text-center">

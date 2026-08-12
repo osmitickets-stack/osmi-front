@@ -250,7 +250,7 @@ export const HeroSection = () => {
                 href="/events"
                 className="inline-flex items-center gap-2 px-7 sm:px-9 py-4 sm:py-4.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/15 text-sm sm:text-base font-semibold text-white hover:bg-white/20 hover:border-primary/30 transition-all hover:scale-105 active:scale-95 min-h-[52px] sm:min-h-[56px]"
               >
-                Explorar más
+                Más ...
               </Link>
             </div>
           </div>
