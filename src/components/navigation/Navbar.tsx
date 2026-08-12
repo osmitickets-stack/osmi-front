@@ -118,7 +118,7 @@ export const Navbar = () => {
               </Link>
               <Link
                 href="/register"
-                className="whitespace-nowrap rounded-xl bg-primary px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-primary/20 transition-all hover:bg-primary/90"
+                className="whitespace-nowrap rounded-xl bg-primary px-8 py-3 text-sm font-bold text-white shadow-lg shadow-primary/20 transition-all hover:bg-primary/90"
               >
                 Registrarse
               </Link>

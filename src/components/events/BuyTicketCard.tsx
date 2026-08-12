@@ -42,14 +42,11 @@ export default function BuyTicketCard({
     addTicket,
     removeTicket,
     updateQuantity,
-    getTotal,
-    getTicketCount,
   } = useCartStore();
 
   const [ticketTypes, setTicketTypes] = useState<TicketType[]>([]);
   const [loadingTypes, setLoadingTypes] = useState(true);
-  const [checkoutLoading, setCheckoutLoading] =
-    useState(false);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -193,176 +190,154 @@ export default function BuyTicketCard({
   }
 
   return (
-    <div className="glass-card p-6 space-y-6 glow-primary">
+    <div className="lg:sticky lg:top-24">
+      <div className="glass-card p-6 space-y-6 glow-primary max-h-[calc(100vh-120px)] overflow-y-auto">
+        <h3 className="text-xl font-bold">
+          Comprar boletos
+        </h3>
 
-      <h3 className="text-xl font-bold">
-        Comprar boletos
-      </h3>
+        {/* Evento */}
+        <div className="space-y-1 text-sm text-muted">
+          <p>{formattedDate}</p>
+          <p>{formattedTime}</p>
+          <p>{location}</p>
+        </div>
 
-      {/* Evento */}
-      <div className="space-y-1 text-sm text-muted">
-        <p>{formattedDate}</p>
-        <p>{formattedTime}</p>
-        <p>{location}</p>
-      </div>
+        {/* Ticket types - Scrolleable */}
+        <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scroll">
+          {ticketTypes.map((type) => {
+            const selected =
+              eventTickets.find(
+                (t) =>
+                  t.ticketTypeId ===
+                  type.id
+              );
 
-      {/* Ticket types */}
-      <div className="space-y-4">
+            const qty =
+              selected?.quantity || 0;
 
-        {ticketTypes.map((type) => {
-          const selected =
-            eventTickets.find(
-              (t) =>
-                t.ticketTypeId ===
-                type.id
-            );
+            const max =
+              Math.min(
+                type.maxPerOrder,
+                type.availableQuantity
+              );
 
-          const qty =
-            selected?.quantity || 0;
+            return (
+              <div
+                key={type.id}
+                className="rounded-2xl border border-white/10 p-4 space-y-3 hover:border-white/20 transition-all"
+              >
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="font-semibold">
+                      {type.name}
+                    </p>
+                    <p className="text-primary font-bold text-lg">
+                      $
+                      {type.basePrice.toLocaleString(
+                        "es-MX"
+                      )}
+                    </p>
+                  </div>
 
-          const max =
-            Math.min(
-              type.maxPerOrder,
-              type.availableQuantity
-            );
-
-          return (
-            <div
-              key={type.id}
-              className="rounded-2xl border border-white/10 p-4 space-y-3 hover:border-white/20 transition-all"
-            >
-              <div className="flex justify-between items-center">
-
-                <div>
-                  <p className="font-semibold">
-                    {type.name}
-                  </p>
-
-                  <p className="text-primary font-bold text-lg">
-                    $
-                    {type.basePrice.toLocaleString(
-                      "es-MX"
-                    )}
-                  </p>
+                  {qty === 0 ? (
+                    <button
+                      onClick={() =>
+                        handleAdd(type)
+                      }
+                      disabled={
+                        type.availableQuantity ===
+                        0
+                      }
+                      className="rounded-full bg-primary/20 px-4 py-2 text-sm font-bold text-primary hover:bg-primary/30 disabled:opacity-30"
+                    >
+                      {type.availableQuantity ===
+                      0
+                        ? "Agotado"
+                        : "Agregar"}
+                    </button>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() =>
+                          handleQuantity(
+                            type,
+                            -1
+                          )
+                        }
+                        className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
+                      >
+                        <Minus size={14} />
+                      </button>
+                      <span className="w-6 text-center font-bold">
+                        {qty}
+                      </span>
+                      <button
+                        disabled={
+                          qty >= max
+                        }
+                        onClick={() =>
+                          handleQuantity(
+                            type,
+                            1
+                          )
+                        }
+                        className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors disabled:opacity-30"
+                      >
+                        <Plus size={14} />
+                      </button>
+                    </div>
+                  )}
                 </div>
 
-                {qty === 0 ? (
-                  <button
-                    onClick={() =>
-                      handleAdd(type)
-                    }
-                    disabled={
-                      type.availableQuantity ===
-                      0
-                    }
-                    className="rounded-full bg-primary/20 px-4 py-2 text-sm font-bold text-primary hover:bg-primary/30 disabled:opacity-30"
-                  >
-                    {type.availableQuantity ===
-                    0
-                      ? "Agotado"
-                      : "Agregar"}
-                  </button>
-                ) : (
-                  <div className="flex items-center gap-2">
-
-                    <button
-                      onClick={() =>
-                        handleQuantity(
-                          type,
-                          -1
-                        )
-                      }
-                      className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center"
-                    >
-                      <Minus size={14} />
-                    </button>
-
-                    <span className="w-6 text-center font-bold">
-                      {qty}
-                    </span>
-
-                    <button
-                      disabled={
-                        qty >= max
-                      }
-                      onClick={() =>
-                        handleQuantity(
-                          type,
-                          1
-                        )
-                      }
-                      className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center disabled:opacity-30"
-                    >
-                      <Plus size={14} />
-                    </button>
-                  </div>
-                )}
+                <div className="flex justify-between text-xs text-muted-dark">
+                  <span>
+                    {type.availableQuantity} disponibles
+                  </span>
+                  <span>Máx {type.maxPerOrder}</span>
+                </div>
               </div>
-
-              <div className="flex justify-between text-xs text-muted-dark">
-                <span>
-                  {
-                    type.availableQuantity
-                  }{" "}
-                  disponibles
-                </span>
-
-                <span>
-                  Máx {type.maxPerOrder}
-                </span>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Resumen */}
-      {eventTickets.length > 0 && (
-        <div className="border-t border-white/10 pt-5 space-y-4">
-
-          <div className="flex justify-between text-sm">
-            <span>
-              Boletos
-            </span>
-            <span className="font-semibold">
-              {ticketCount}
-            </span>
-          </div>
-
-          <div className="flex justify-between text-lg font-bold">
-            <span>Total</span>
-            <span className="text-primary">
-              $
-              {total.toLocaleString(
-                "es-MX"
-              )}
-            </span>
-          </div>
-
-          <button
-            onClick={
-              handleCheckout
-            }
-            disabled={
-              checkoutLoading
-            }
-            className="w-full rounded-full bg-primary px-6 py-4 text-sm font-bold text-white shadow-lg shadow-primary/30 hover:bg-primary/90 transition-all flex justify-center items-center gap-2 disabled:opacity-50"
-          >
-            <ShoppingCart
-              size={18}
-            />
-
-            {checkoutLoading
-              ? "Validando..."
-              : "Proceder al pago"}
-          </button>
+            );
+          })}
         </div>
-      )}
 
-      <p className="text-xs text-center text-muted-dark">
-        Pago seguro con Stripe •
-        Confirmación inmediata
-      </p>
+        {/* Resumen - SIEMPRE VISIBLE */}
+        {eventTickets.length > 0 && (
+          <div className="border-t border-white/10 pt-4 space-y-4">
+            <div className="flex justify-between text-sm">
+              <span>Boletos</span>
+              <span className="font-semibold">
+                {ticketCount}
+              </span>
+            </div>
+
+            <div className="flex justify-between text-lg font-bold">
+              <span>Total</span>
+              <span className="text-primary">
+                $
+                {total.toLocaleString(
+                  "es-MX"
+                )}
+              </span>
+            </div>
+
+            <button
+              onClick={handleCheckout}
+              disabled={checkoutLoading}
+              className="w-full rounded-full bg-primary px-6 py-4 text-sm font-bold text-white shadow-lg shadow-primary/30 hover:bg-primary/90 transition-all flex justify-center items-center gap-2 disabled:opacity-50"
+            >
+              <ShoppingCart size={18} />
+              {checkoutLoading
+                ? "Validando..."
+                : "Proceder al pago"}
+            </button>
+          </div>
+        )}
+
+        <p className="text-xs text-center text-muted-dark pt-2 border-t border-white/5">
+          Pago seguro con Stripe • Confirmación inmediata
+        </p>
+      </div>
     </div>
   );
 }
