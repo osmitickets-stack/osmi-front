@@ -31,7 +31,7 @@ export const Navbar = () => {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-white/[0.06] bg-background/80 backdrop-blur-2xl">
-      <div className="mx-auto flex h-16 w-full max-w-[1600px] items-center px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex h-16 w-full max-w-[1600px] items-center justify-between px-4 sm:px-6 lg:px-8">
         
         {/* ======================== LOGO ======================== */}
         <Link
@@ -42,7 +42,7 @@ export const Navbar = () => {
         </Link>
 
         {/* ======================== SEARCH ======================== */}
-        <div className="hidden min-w-0 flex-1 max-w-[380px] relative lg:flex mx-4">
+        <div className="hidden lg:flex relative max-w-[380px] flex-1 mx-4">
           <div className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted-dark">
             <Search size={16} />
           </div>
@@ -53,11 +53,11 @@ export const Navbar = () => {
           />
         </div>
 
-        {/* ======================== NAVEGACIÓN ======================== */}
-        <nav className="hidden lg:flex shrink-0 items-center gap-4 whitespace-nowrap">
+        {/* ======================== CENTRO: NAVEGACIÓN ======================== */}
+        <nav className="hidden lg:flex items-center gap-6">
           <Link
             href="/events"
-            className={`flex shrink-0 items-center whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+            className={`whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
               pathname.startsWith("/events")
                 ? "bg-white/[0.06] text-foreground"
                 : "text-muted hover:bg-white/[0.03] hover:text-foreground"
@@ -68,7 +68,7 @@ export const Navbar = () => {
 
           <Link
             href="/categorias"
-            className={`flex shrink-0 items-center whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+            className={`whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
               pathname.startsWith("/categorias")
                 ? "bg-white/[0.06] text-foreground"
                 : "text-muted hover:bg-white/[0.03] hover:text-foreground"
@@ -79,7 +79,7 @@ export const Navbar = () => {
 
           <Link
             href="/para-organizadores"
-            className={`flex shrink-0 items-center whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+            className={`whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
               pathname.startsWith("/para-organizadores")
                 ? "bg-white/[0.06] text-foreground"
                 : "text-muted hover:bg-white/[0.03] hover:text-foreground"
@@ -89,20 +89,20 @@ export const Navbar = () => {
           </Link>
         </nav>
 
-        {/* ======================== AUTH ======================== */}
-        <div className="ml-auto hidden shrink-0 items-center gap-3 lg:flex">
+        {/* ======================== DERECHA: AUTH ======================== */}
+        <div className="hidden lg:flex items-center gap-3 shrink-0">
           {isLoggedIn ? (
             <>
               <Link
                 href="/dashboard"
-                className="flex shrink-0 items-center gap-2 whitespace-nowrap rounded-xl px-4 py-2.5 text-sm font-medium text-muted transition-colors hover:bg-white/[0.03] hover:text-foreground"
+                className="flex items-center gap-2 whitespace-nowrap rounded-xl px-4 py-2.5 text-sm font-medium text-muted transition-colors hover:bg-white/[0.03] hover:text-foreground"
               >
                 <Ticket size={16} />
                 Mis boletos
               </Link>
               <button
                 onClick={handleLogout}
-                className="flex shrink-0 items-center gap-2 whitespace-nowrap rounded-xl px-4 py-2.5 text-sm font-medium text-muted transition-colors hover:bg-white/[0.03] hover:text-foreground"
+                className="flex items-center gap-2 whitespace-nowrap rounded-xl px-4 py-2.5 text-sm font-medium text-muted transition-colors hover:bg-white/[0.03] hover:text-foreground"
               >
                 <LogOut size={16} />
                 Salir
@@ -112,13 +112,13 @@ export const Navbar = () => {
             <>
               <Link
                 href="/login"
-                className="shrink-0 whitespace-nowrap rounded-xl border border-white/[0.06] px-5 py-2.5 text-sm font-medium text-muted transition-colors hover:bg-white/[0.03] hover:text-foreground"
+                className="whitespace-nowrap rounded-xl border border-white/[0.06] px-5 py-2.5 text-sm font-medium text-muted transition-colors hover:bg-white/[0.03] hover:text-foreground"
               >
                 Iniciar Sesión
               </Link>
               <Link
                 href="/register"
-                className="shrink-0 whitespace-nowrap rounded-xl bg-primary px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-primary/20 transition-all hover:bg-primary/90"
+                className="whitespace-nowrap rounded-xl bg-primary px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-primary/20 transition-all hover:bg-primary/90"
               >
                 Registrarse
               </Link>
