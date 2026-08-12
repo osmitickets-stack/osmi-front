@@ -30,7 +30,7 @@ const AD_SLIDES = [
     linkText: "Registrarme ahora",
     color: "from-secondary/40 via-primary/20",
     badge: "EXCLUSIVO",
-    image: `${CLOUDINARY_BASE}/v1779219665/WhatsApp_Image_2026-05-09_at_2.02.54_PM_mxqy93.jpg`,
+    image: `${CLOUDINARY_BASE}/v1786533285/ChatGPT_Image_Aug_12_2026_05_13_53_AM_powlhq.png`,
   },
   {
     id: "organizadores",
@@ -41,7 +41,7 @@ const AD_SLIDES = [
     linkText: "Saber más",
     color: "from-primary/40 via-secondary/20",
     badge: "ORGANIZADORES",
-    image: `${CLOUDINARY_BASE}/v1779177598/studio2.jpg`,
+    image: `${CLOUDINARY_BASE}/v1786533285/ChatGPT_Image_Aug_12_2026_05_08_02_AM_w0cilx.png`,
   },
   {
     id: "tienda",
@@ -52,7 +52,7 @@ const AD_SLIDES = [
     linkText: "Cómo llegar",
     color: "from-orange-500/30 via-primary/20",
     badge: "TIENDA",
-    image: `${CLOUDINARY_BASE}/v1779219665/WhatsApp_Image_2026-05-09_at_2.02.54_PM_mxqy93.jpg`,
+    image: `${CLOUDINARY_BASE}/v1786533285/ChatGPT_Image_Aug_12_2026_05_11_34_AM_wboxeg.png`,
   },
 ];
 
