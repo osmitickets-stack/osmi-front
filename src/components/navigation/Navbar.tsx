@@ -102,7 +102,7 @@ export const Navbar = () => {
           </Link>
 
           <Link
-            href="/categorias"
+            href="/events"
             className={`whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
               pathname.startsWith("/categorias")
                 ? "bg-white/[0.06] text-foreground"
