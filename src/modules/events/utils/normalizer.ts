@@ -21,6 +21,8 @@ export interface RawEvent {
   min_price?: number;
   latitude?: number;
   longitude?: number;
+  category?: string;
+  tags?: string[];
 }
 
 export interface NormalizedEvent {
@@ -33,10 +35,14 @@ export interface NormalizedEvent {
   min_price: number;
   latitude?: number;
   longitude?: number;
+  // ==================== NUEVO ====================
+  category: string;         // ← AGREGAR
+  tags: string[];           // ← AGREGAR
+  // ================================================
 }
 
 export function normalizeEvent(event: RawEvent): NormalizedEvent {
-  let location = "Proximamente";
+  let location = "Próximamente";
   const venue = event.venueName || event.venue_name || "";
   const city = event.city || "";
   const state = event.state || "";
@@ -57,5 +63,9 @@ export function normalizeEvent(event: RawEvent): NormalizedEvent {
     min_price: event.min_price || event.minPrice || 0,
     latitude: event.latitude,
     longitude: event.longitude,
+    // ==================== NUEVO ====================
+    category: event.category || "",
+    tags: event.tags || [],
+    // ================================================
   };
 }
