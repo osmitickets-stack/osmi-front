@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
-import { Ticket, LogOut, Menu, X, Search } from "lucide-react";
+import { Ticket, LogOut, Menu, X, Search, Building2 } from "lucide-react";
 
 function getCookie(name: string): string | null {
   if (typeof document === "undefined") return null;
@@ -17,15 +17,50 @@ export const Navbar = () => {
   const router = useRouter();
   const pathname = usePathname();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isOrganizer, setIsOrganizer] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
-    setIsLoggedIn(!!getCookie("token"));
+    const token = getCookie("token");
+    setIsLoggedIn(!!token);
+
+    // Verificar si el usuario es organizador
+    if (token) {
+      checkIfOrganizer(token);
+    } else {
+      setIsOrganizer(false);
+    }
   }, [pathname]);
+
+  const checkIfOrganizer = async (token: string) => {
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      const userId = payload.user_id;
+
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/v1/organizers?user_id=${userId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (res.ok) {
+        const data = await res.json();
+        const organizer = data.organizers?.[0];
+        // Solo considerar organizador si está aprobado
+        setIsOrganizer(organizer && organizer.approval_status === "approved");
+      } else {
+        setIsOrganizer(false);
+      }
+    } catch (error) {
+      setIsOrganizer(false);
+    }
+  };
 
   const handleLogout = () => {
     document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
     setIsLoggedIn(false);
+    setIsOrganizer(false);
     router.push("/");
   };
 
@@ -77,16 +112,20 @@ export const Navbar = () => {
             Categorías
           </Link>
 
-          <Link
-            href="/para-organizadores"
-            className={`whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-              pathname.startsWith("/para-organizadores")
-                ? "bg-white/[0.06] text-foreground"
-                : "text-muted hover:bg-white/[0.03] hover:text-foreground"
-            }`}
-          >
-            Para Organizadores
-          </Link>
+          {/* ======================== BOTÓN PARA ORGANIZADORES (SOLO SI ES ORGANIZADOR) ======================== */}
+          {isOrganizer && (
+            <Link
+              href="/organizador"
+              className={`whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium transition-colors flex items-center gap-1.5 ${
+                pathname.startsWith("/organizador")
+                  ? "bg-primary/10 text-primary border border-primary/20"
+                  : "text-muted hover:bg-white/[0.03] hover:text-foreground"
+              }`}
+            >
+              <Building2 size={16} />
+              Mi Panel
+            </Link>
+          )}
         </nav>
 
         {/* ======================== DERECHA: AUTH ======================== */}
@@ -162,13 +201,18 @@ export const Navbar = () => {
           >
             Categorías
           </Link>
-          <Link
-            href="/para-organizadores"
-            className="block py-2.5 text-sm font-medium text-muted hover:text-foreground transition-colors"
-            onClick={() => setMobileOpen(false)}
-          >
-            Para Organizadores
-          </Link>
+
+          {/* ======================== BOTÓN PARA ORGANIZADORES EN MÓVIL ======================== */}
+          {isOrganizer && (
+            <Link
+              href="/organizador"
+              className="block py-2.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors flex items-center gap-2"
+              onClick={() => setMobileOpen(false)}
+            >
+              <Building2 size={16} />
+              Mi Panel
+            </Link>
+          )}
 
           <hr className="border-white/[0.06]" />
 

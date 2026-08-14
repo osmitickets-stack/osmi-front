@@ -4,30 +4,30 @@ import { MessageCircle } from "lucide-react";
 export const Footer = () => {
   return (
     <footer className="border-t border-white/5 bg-background-secondary/30 mt-auto">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
-        {/* Grid principal */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 sm:gap-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12 md:py-16">
+        {/* Grid principal - RESPONSIVE: 3 columnas en móvil */}
+        <div className="grid grid-cols-3 gap-4 sm:gap-6 md:gap-8 lg:gap-10">
           
-          {/* ==================== MARCA ==================== */}
-          <div className="col-span-2 md:col-span-1 space-y-4">
-            <Link href="/" className="text-2xl font-black text-gradient tracking-tight">
+          {/* ==================== MARCA (ocupa toda la fila en móvil) ==================== */}
+          <div className="col-span-3 md:col-span-1 space-y-3 sm:space-y-4">
+            <Link href="/" className="text-2xl sm:text-3xl font-black text-gradient tracking-tight">
               osmi
             </Link>
-            <p className="text-sm text-muted-dark leading-relaxed max-w-xs">
+            <p className="text-xs sm:text-sm text-muted-dark leading-relaxed max-w-xs">
               La experiencia de boletos más inteligente del planeta. Seguro, rápido y confiable.
             </p>
             
-            {/* Redes sociales con SVG inline - SIN LUCIDE */}
-            <div className="flex gap-3">
+            {/* Redes sociales */}
+            <div className="flex gap-2 sm:gap-3">
               {/* Instagram */}
               <a 
-                href="https://instagram.com" 
+                href="https://www.instagram.com/desfragmentado_el_mc_legendari/" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center text-muted-dark hover:text-primary hover:bg-white/10 transition-all"
+                className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/5 flex items-center justify-center text-muted-dark hover:text-primary hover:bg-white/10 transition-all"
                 aria-label="Instagram"
               >
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
                 </svg>
               </a>
@@ -37,65 +37,69 @@ export const Footer = () => {
                 href="https://twitter.com" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center text-muted-dark hover:text-primary hover:bg-white/10 transition-all"
+                className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/5 flex items-center justify-center text-muted-dark hover:text-primary hover:bg-white/10 transition-all"
                 aria-label="Twitter"
               >
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
                 </svg>
               </a>
               
               {/* YouTube */}
               <a 
-                href="https://youtube.com" 
+                href="https://www.youtube.com/@desfragmentadoo" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center text-muted-dark hover:text-primary hover:bg-white/10 transition-all"
+                className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/5 flex items-center justify-center text-muted-dark hover:text-primary hover:bg-white/10 transition-all"
                 aria-label="YouTube"
               >
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
                 </svg>
               </a>
               
               {/* Spotify */}
               <a 
-                href="https://open.spotify.com" 
+                href="https://open.spotify.com/intl-es/artist/3o9iSbT2VLRof2zLNQJFNO?si=P_6AqDNQSP6y1JwzPCj9EQ" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center text-muted-dark hover:text-primary hover:bg-white/10 transition-all"
+                className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/5 flex items-center justify-center text-muted-dark hover:text-primary hover:bg-white/10 transition-all"
                 aria-label="Spotify"
               >
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.1-10.56-1.14-.42.12-.78-.12-.9-.48-.12-.42.12-.78.48-.9 4.56-1.02 8.52-.6 11.64 1.32.42.18.48.66.36 1.02zm1.44-3.3c-.3.42-.84.6-1.26.3-3.24-1.98-8.16-2.58-11.94-1.38-.48.18-1.02-.06-1.2-.48-.18-.48.06-1.02.48-1.2 4.32-1.38 9.72-.72 13.44 1.56.48.24.66.78.48 1.2zm.06-3.42c-.36.42-1.02.6-1.44.3-3.78-2.28-9.54-2.52-13.08-1.38-.54.18-1.08-.12-1.26-.6-.18-.54.12-1.08.6-1.26 4.08-1.38 10.38-1.08 14.64 1.5.48.24.6.84.3 1.44z"/>
                 </svg>
               </a>
             </div>
           </div>
 
-          {/* ==================== EXPLORAR ==================== */}
+          {/* ==================== EXPLORAR - columna 1 de 3 en móvil ==================== */}
           <div>
-            <h4 className="text-xs font-bold text-foreground uppercase tracking-wider mb-4">Explorar</h4>
-            <ul className="space-y-2.5">
-              <li><Link href="/events" className="text-sm text-muted-dark hover:text-foreground transition-colors">Conciertos</Link></li>
-              <li><Link href="/events" className="text-sm text-muted-dark hover:text-foreground transition-colors">Deportes</Link></li>
-              <li><Link href="/events" className="text-sm text-muted-dark hover:text-foreground transition-colors">Teatro</Link></li>
-              <li><Link href="/events" className="text-sm text-muted-dark hover:text-foreground transition-colors">Festivales</Link></li>
-              <li><Link href="/events" className="text-sm text-muted-dark hover:text-foreground transition-colors">Experiencias</Link></li>
+            <h4 className="text-[10px] sm:text-xs font-bold text-foreground uppercase tracking-wider mb-2 sm:mb-4">
+              Explorar
+            </h4>
+            <ul className="space-y-1.5 sm:space-y-2.5">
+              <li><Link href="/events" className="text-[11px] sm:text-sm text-muted-dark hover:text-foreground transition-colors">Conciertos</Link></li>
+              <li><Link href="/events" className="text-[11px] sm:text-sm text-muted-dark hover:text-foreground transition-colors">Deportes</Link></li>
+              <li><Link href="/events" className="text-[11px] sm:text-sm text-muted-dark hover:text-foreground transition-colors">Teatro</Link></li>
+              <li><Link href="/events" className="text-[11px] sm:text-sm text-muted-dark hover:text-foreground transition-colors">Festivales</Link></li>
+              <li><Link href="/events" className="text-[11px] sm:text-sm text-muted-dark hover:text-foreground transition-colors">Experiencias</Link></li>
             </ul>
           </div>
 
-          {/* ==================== OSMI ==================== */}
+          {/* ==================== OSMI - columna 2 de 3 en móvil ==================== */}
           <div>
-            <h4 className="text-xs font-bold text-foreground uppercase tracking-wider mb-4">osmi</h4>
-            <ul className="space-y-2.5">
+            <h4 className="text-[10px] sm:text-xs font-bold text-foreground uppercase tracking-wider mb-2 sm:mb-4">
+              osmi
+            </h4>
+            <ul className="space-y-1.5 sm:space-y-2.5">
               <li>
-                <Link href="/sobre-nosotros" className="text-sm text-muted-dark hover:text-foreground transition-colors">
+                <Link href="/sobre-nosotros" className="text-[11px] sm:text-sm text-muted-dark hover:text-foreground transition-colors">
                   Sobre nosotros
                 </Link>
               </li>
               <li>
-                <Link href="/para-organizadores" className="text-sm text-muted-dark hover:text-foreground transition-colors">
+                <Link href="/para-organizadores" className="text-[11px] sm:text-sm text-muted-dark hover:text-foreground transition-colors">
                   Para organizadores
                 </Link>
               </li>
@@ -104,40 +108,42 @@ export const Footer = () => {
                   href="https://wa.me/523345998987?text=Hola%20osmi%20quiero%20informacion"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm text-muted-dark hover:text-foreground transition-colors flex items-center gap-1.5"
+                  className="text-[11px] sm:text-sm text-muted-dark hover:text-foreground transition-colors flex items-center gap-1 sm:gap-1.5"
                 >
-                  <MessageCircle size={14} className="text-[#25D366]" />
+                  <MessageCircle size={12} className="text-[#25D366]" />
                   Contacto
                 </a>
               </li>
               <li>
-                <Link href="/prensa" className="text-sm text-muted-dark hover:text-foreground transition-colors">
+                <Link href="/prensa" className="text-[11px] sm:text-sm text-muted-dark hover:text-foreground transition-colors">
                   Prensa
                 </Link>
               </li>
               <li>
-                <Link href="/desfragmentado" className="text-sm text-muted-dark hover:text-foreground transition-colors">
+                <Link href="/desfragmentado" className="text-[11px] sm:text-sm text-muted-dark hover:text-foreground transition-colors">
                   Desfragmentado
                 </Link>
               </li>
               <li>
-                <Link href="/Manitas" className="text-sm text-muted-dark hover:text-foreground transition-colors">
+                <Link href="/Manitas" className="text-[11px] sm:text-sm text-muted-dark hover:text-foreground transition-colors">
                   Taller Manitas
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* ==================== LEGAL ==================== */}
+          {/* ==================== LEGAL - columna 3 de 3 en móvil ==================== */}
           <div>
-            <h4 className="text-xs font-bold text-foreground uppercase tracking-wider mb-4">Legal</h4>
-            <ul className="space-y-2.5">
+            <h4 className="text-[10px] sm:text-xs font-bold text-foreground uppercase tracking-wider mb-2 sm:mb-4">
+              Legal
+            </h4>
+            <ul className="space-y-1.5 sm:space-y-2.5">
               <li>
                 <a
                   href="/docs/privacidad.pdf"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm text-muted-dark hover:text-foreground transition-colors"
+                  className="text-[11px] sm:text-sm text-muted-dark hover:text-foreground transition-colors"
                 >
                   Privacidad
                 </a>
@@ -147,13 +153,13 @@ export const Footer = () => {
                   href="/docs/terminos.pdf"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm text-muted-dark hover:text-foreground transition-colors"
+                  className="text-[11px] sm:text-sm text-muted-dark hover:text-foreground transition-colors"
                 >
-                  Términos y condiciones
+                  Términos
                 </a>
               </li>
               <li>
-                <Link href="/cookies" className="text-sm text-muted-dark hover:text-foreground transition-colors">
+                <Link href="/cookies" className="text-[11px] sm:text-sm text-muted-dark hover:text-foreground transition-colors">
                   Cookies
                 </Link>
               </li>
@@ -162,7 +168,7 @@ export const Footer = () => {
         </div>
 
         {/* ==================== BOTTOM ==================== */}
-        <div className="border-t border-white/5 mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-dark">
+        <div className="border-t border-white/5 mt-6 sm:mt-8 md:mt-10 pt-4 sm:pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 text-[10px] sm:text-xs text-muted-dark">
           <p>© 2026 osmi. Todos los derechos reservados.</p>
           <p>
             Creado por <span className="text-gradient font-semibold">Francisco D. Zamora</span>
