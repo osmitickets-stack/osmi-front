@@ -21,8 +21,6 @@ export interface RawEvent {
   min_price?: number;
   latitude?: number;
   longitude?: number;
-  category: string;
-  tags: string[];          // ← Array de tags (para múltiples categorías)
 }
 
 export interface NormalizedEvent {
@@ -59,7 +57,5 @@ export function normalizeEvent(event: RawEvent): NormalizedEvent {
     min_price: event.min_price || event.minPrice || 0,
     latitude: event.latitude,
     longitude: event.longitude,
-    category: event.category || "",
-    tags: event.tags || [],
   };
 }
