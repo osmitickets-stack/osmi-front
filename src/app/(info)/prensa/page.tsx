@@ -17,7 +17,8 @@ import {
   FileImage,
   Video,
   Award,
-  Star
+  Star,
+  ChevronRight
 } from "lucide-react";
 import Link from "next/link";
 
