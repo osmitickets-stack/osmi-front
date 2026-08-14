@@ -9,22 +9,13 @@ import { Navbar } from "@/components/navigation/Navbar";
 import { Footer } from "@/components/navigation/Footer";
 import { EventCard } from "@/components/ui/EventCard";
 import { normalizeEvent, type NormalizedEvent } from "@/modules/events/utils/normalizer";
+import { CATEGORIES, type CategorySlug } from "@/lib/categories";
 import { X, Search } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Explorar Eventos - osmi",
-  description: "Descubre los mejores eventos, conciertos, festivales y más en osmi.",
+  title: "Explorar Eventos - MyOsmi",
+  description: "Descubre los mejores eventos, conciertos, festivales y más en MyOsmi.",
 };
-
-// Categorías disponibles
-const CATEGORIES = [
-  { slug: "conciertos", label: "🎵 Conciertos" },
-  { slug: "deportes", label: "⚽ Deportes" },
-  { slug: "teatro", label: "🎭 Teatro" },
-  { slug: "festivales", label: "🎪 Festivales" },
-  { slug: "experiencias", label: "✨ Experiencias" },
-  { slug: "infantiles", label: "🧸 Infantiles" },
-];
 
 interface EventsPageProps {
   searchParams: Promise<{
@@ -35,8 +26,12 @@ interface EventsPageProps {
 
 export default async function EventsPage({ searchParams }: EventsPageProps) {
   const params = await searchParams;
-  const category = params.category || "";
+  const categorySlug = params.category || "";
   const searchQuery = params.search || "";
+
+  // Validar que la categoría exista
+  const validCategory = CATEGORIES.find(c => c.slug === categorySlug);
+  const isValidCategory = !!validCategory;
 
   try {
     const rawEvents = await api.get<any>("/v1/events");
@@ -47,13 +42,27 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
       ? rawEvents.events.map(normalizeEvent)
       : [];
 
-    // Filtrar por categoría
-    if (category) {
-      eventList = eventList.filter((event) =>
-        event.tags?.some((tag: string) =>
-          tag.toLowerCase().includes(category.toLowerCase())
-        )
-      );
+    // ============================================================
+    // FILTRAR POR CATEGORÍA
+    // ============================================================
+    if (categorySlug && isValidCategory) {
+      eventList = eventList.filter((event) => {
+        // 1. Revisar si tiene el campo 'category' (opción recomendada)
+        if (event.category && event.category.toLowerCase() === categorySlug) {
+          return true;
+        }
+        // 2. Revisar si tiene 'tags' (opción flexible)
+        if (event.tags && event.tags.length > 0) {
+          return event.tags.some((tag: string) =>
+            tag.toLowerCase().includes(categorySlug)
+          );
+        }
+        // 3. Fallback: buscar en nombre/descripción
+        return (
+          event.name?.toLowerCase().includes(categorySlug) ||
+          event.description?.toLowerCase().includes(categorySlug)
+        );
+      });
     }
 
     // Filtrar por búsqueda
@@ -64,19 +73,19 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
       );
     }
 
-    const isFilterActive = category || searchQuery;
+    const isFilterActive = categorySlug || searchQuery;
+    const categoryLabel = validCategory?.label || "Eventos";
 
     return (
       <div className="min-h-screen flex flex-col bg-black">
         <Navbar />
 
         <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12 w-full">
+          
           {/* ==================== HEADER ==================== */}
           <div className="mb-8">
             <h1 className="text-3xl sm:text-4xl font-black text-foreground">
-              {category
-                ? CATEGORIES.find(c => c.slug === category)?.label || "Eventos"
-                : "Explorar eventos"}
+              {isFilterActive && categorySlug ? categoryLabel : "Explorar eventos"}
             </h1>
             <p className="text-muted mt-1">
               {eventList.length} {eventList.length === 1 ? "evento" : "eventos"} disponibles
@@ -88,7 +97,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
             <Link
               href="/events"
               className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                !category && !searchQuery
+                !categorySlug && !searchQuery
                   ? "bg-primary/20 text-primary border border-primary/30"
                   : "bg-white/5 text-muted border border-white/10 hover:border-primary/30 hover:text-foreground"
               }`}
@@ -100,7 +109,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
                 key={cat.slug}
                 href={`/events?category=${cat.slug}`}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                  category === cat.slug
+                  categorySlug === cat.slug
                     ? "bg-primary/20 text-primary border border-primary/30"
                     : "bg-white/5 text-muted border border-white/10 hover:border-primary/30 hover:text-foreground"
                 }`}
@@ -114,9 +123,9 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
           {isFilterActive && (
             <div className="flex items-center gap-2 mb-6">
               <span className="text-sm text-muted">Filtro activo:</span>
-              {category && (
+              {categorySlug && validCategory && (
                 <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm border border-primary/20">
-                  {CATEGORIES.find(c => c.slug === category)?.label || category}
+                  {validCategory.label}
                   <Link href="/events" className="hover:text-white transition-colors">
                     <X size={14} />
                   </Link>
@@ -149,7 +158,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
               <p className="text-muted text-sm">
                 {searchQuery
                   ? `No encontramos resultados para "${searchQuery}"`
-                  : "No hay eventos disponibles en esta categoría"}
+                  : `No hay eventos disponibles en "${categoryLabel}"`}
               </p>
               <Link
                 href="/events"
