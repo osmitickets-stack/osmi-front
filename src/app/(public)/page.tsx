@@ -11,7 +11,7 @@ import { api } from "@/lib/api";
 import { normalizeEvent, type NormalizedEvent } from "@/modules/events/utils/normalizer";
 
 // ============================================================
-// METADATA MEJORADA PARA SEO PREMIUM
+// METADATA
 // ============================================================
 export const metadata = {
   title: "MyOsmi | Boletos para conciertos, deportes y eventos | Compra segura",
@@ -52,6 +52,9 @@ async function getEvents(): Promise<NormalizedEvent[]> {
   } catch { return []; }
 }
 
+// ============================================================
+// CATEGORÍAS - CORREGIDAS (apuntan a /events con filtros)
+// ============================================================
 const categories = [
   { icon: Music, label: "Conciertos", color: "text-primary", href: "/events?category=conciertos" },
   { icon: Trophy, label: "Deportes", color: "text-accent", href: "/events?category=deportes" },
@@ -68,19 +71,19 @@ const categories = [
 export default async function HomePage() {
   const events = await getEvents();
 
-  // Schema.org markup para eventos (JSON-LD)
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    name: "osmi",
-    description: "Plataforma de ticketing para conciertos, deportes, teatro y festivales.",
-    url: "https://osmi.app",
-    potentialAction: {
-      "@type": "SearchAction",
-      target: "https://osmi.app/events?search={search_term_string}",
-      "query-input": "required name=search_term_string",
-    },
-  };
+// Schema.org markup para eventos (JSON-LD)
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "MyOsmi",  // ← CAMBIADO a MyOsmi
+  description: "Plataforma de ticketing para conciertos, deportes, teatro y festivales.",
+  url: "https://myosmi.com",
+  potentialAction: {
+    "@type": "SearchAction",
+    target: "https://myosmi.com/events?search={search_term_string}",
+    "query-input": "required name=search_term_string",
+  },
+};
 
   return (
     <>
@@ -95,11 +98,10 @@ export default async function HomePage() {
         <HeroSection />
 
         {/* ============================================================
-            CATEGORÍAS - CON EFECTO NEÓN MEJORADO
+            CATEGORÍAS
         ============================================================ */}
         <section className="section-full bg-transparent py-16">
           <div className="section-inner">
-            {/* Encabezado con gradiente */}
             <div className="text-center mb-12">
               <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold tracking-widest border border-primary/20 mb-4">
                 DESCUBRE
@@ -112,7 +114,6 @@ export default async function HomePage() {
               </p>
             </div>
 
-            {/* Grid de categorías con efecto neón */}
             <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
               {categories.map(({ icon: Icon, label, color, href }) => (
                 <Link
@@ -120,7 +121,7 @@ export default async function HomePage() {
                   href={href}
                   className="glass-card p-6 flex flex-col items-center gap-3 text-center hover:glow-primary transition-all duration-300 group border-neon"
                 >
-                  <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 group-hover:shadow-glow">
+                  <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                     <Icon size={26} className={`${color} group-hover:scale-110 transition-transform`} />
                   </div>
                   <span className="text-xs font-semibold text-foreground/80 group-hover:text-foreground transition-colors">
@@ -134,12 +135,11 @@ export default async function HomePage() {
         </section>
 
         {/* ============================================================
-            EVENTOS DESTACADOS - CON EFECTO NEÓN
+            EVENTOS DESTACADOS
         ============================================================ */}
         {events.length > 0 && (
           <section className="section-full bg-transparent py-16 border-t border-white/5">
             <div className="section-inner">
-              {/* Encabezado con efecto */}
               <div className="flex flex-col md:flex-row items-center justify-between mb-10">
                 <div>
                   <span className="inline-block px-4 py-1.5 rounded-full bg-secondary/10 text-secondary text-xs font-bold tracking-widest border border-secondary/20 mb-3">
@@ -158,7 +158,6 @@ export default async function HomePage() {
                 </Link>
               </div>
 
-              {/* Grid de eventos con efecto hover mejorado */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
                 {events.slice(0, 4).map((event) => (
                   <div key={event.public_id} className="animate-fade-in-up" style={{ animationDelay: `${Math.random() * 0.3}s` }}>
@@ -171,7 +170,7 @@ export default async function HomePage() {
         )}
 
         {/* ============================================================
-            CONFIANZA - CON EFECTO NEÓN
+            CONFIANZA - SOLO DATOS REALES
         ============================================================ */}
         <section className="section-full bg-transparent py-16 border-t border-white/5">
           <div className="section-inner text-center">
@@ -184,7 +183,7 @@ export default async function HomePage() {
             </div>
 
             <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16">
-              {/* Marcas con efecto glow en hover */}
+              {/* SOLO LOS QUE EXISTEN EN TU SEED */}
               {["Alas Wings", "Desfragmentado", "El País"].map((brand) => (
                 <span
                   key={brand}
@@ -195,7 +194,6 @@ export default async function HomePage() {
               ))}
             </div>
 
-            {/* Estadísticas de confianza */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-12">
               <div className="glass-card p-6 text-center">
                 <div className="text-3xl md:text-4xl font-black text-gradient">25+</div>
@@ -218,7 +216,7 @@ export default async function HomePage() {
         </section>
 
         {/* ============================================================
-            CALL TO ACTION - CON EFECTO NEÓN
+            CALL TO ACTION
         ============================================================ */}
         <section className="section-full bg-transparent py-16 border-t border-white/5">
           <div className="section-inner">

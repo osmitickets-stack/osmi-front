@@ -195,7 +195,7 @@ export const Navbar = () => {
             Explorar
           </Link>
           <Link
-            href="/categorias"
+            href="/events"
             className="block py-2.5 text-sm font-medium text-muted hover:text-foreground transition-colors"
             onClick={() => setMobileOpen(false)}
           >

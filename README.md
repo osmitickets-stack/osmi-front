@@ -48,10 +48,9 @@ osmi-front/
 │   │   ├── favicon.ico              ← Ícono de la aplicación
 │   │   ├── globals.css              ← Estilos globales
 │   │   └── layout.tsx               ← Layout raíz de la app
+
 │   │
 │   ├── components/                  ← Componentes UI reutilizables
-│   │   ├── checkout/                ← Componentes de flujo de pago
-│   │   ├── dashboard/               ← Componentes del dashboard
 │   │   ├── events/                  ← Componentes de eventos
 │   │   │   ├── BuyTicketCard.tsx
 │   │   │   ├── TicketSelector.tsx
@@ -62,7 +61,6 @@ osmi-front/
 │   │   │   └── Navbar.tsx           ← Barra de navegación
 │   │   ├── ui/
 │   │   │   └── EventCard.tsx        ← Card de evento
-│   │   └── BuyButton.tsx            ← Botón de compra
 │   │
 │   ├── hooks/                       ← Custom hooks
 │   │
@@ -289,3 +287,132 @@ pending	🟡 Amarillo	En revisión por admin
 draft	⚪ Gris	Borrador, no visible
 cancelled	🔴 Rojo	Cancelado
 finished	⚪ Gris oscuro	Finalizado
+
+
+
+
+
+
+
+
+
+Excelente pregunta. Analizando tu `AdminPage` actual y tu estructura, te doy mi opinión y la mejor solución:
+
+---
+
+## 🧠 ANÁLISIS DEL PANEL DE ADMIN
+
+| Aspecto | Estado | Observación |
+|---------|--------|-------------|
+| **URL** | `/admin` | Pública, cualquiera puede intentar acceder |
+| **Seguridad** | ❌ NINGUNA | No verifica si el usuario es admin |
+| **API** | `http://localhost:8083` | Hardcodeado, debería usar `.env` |
+| **Diseño** | 🟡 Básico | Funcional pero sin estilo premium |
+| **Funcionalidad** | ✅ Aprobar/Rechazar | Funciona pero sin feedback visual |
+
+---
+
+## 🔒 ¿CÓMO DEBE LLEGAR UN ADMIN AL PANEL?
+
+### ❌ Opción 1: URL oculta (NO recomendada)
+```
+/admin-secreto-xyz123
+```
+**Problema:** No es seguro, cualquiera puede adivinarla o encontrarla en logs.
+
+### ✅ Opción 2: Verificación por rol (RECOMENDADA)
+```
+/admin
+```
+**Requisito:** Solo usuarios con rol `admin` pueden acceder.
+
+### ✅ Opción 3: Botón en Navbar (SOLO PARA ADMINS)
+```
+Solo visible si el usuario tiene rol admin
+```
+
+---
+
+## 📁 ESTRUCTURA PARA ADMIN
+
+```
+src/app/(dashboard)/
+├── admin/
+│   ├── page.tsx          ← Panel de admin (ya existe)
+│   ├── layout.tsx        ← Layout con verificación de admin (NUEVO)
+│   └── organizadores/
+│       └── [id]/
+│           └── page.tsx  ← Detalle de organizador (opcional)
+```
+
+---
+
+## 🛡️ SEGURIDAD RECOMENDADA
+
+### 1. Verificar rol en el servidor (BACKEND)
+```tsx
+// En la API, el endpoint /v1/admin/... debe validar que el usuario sea admin
+```
+
+### 2. Verificar rol en el cliente (FRONTEND)
+```tsx
+// Al cargar /admin, verificar si el usuario tiene rol admin
+// Si no, redirigir a /dashboard
+```
+
+### 3. Ocultar el botón en Navbar
+```tsx
+// Solo mostrar "Admin" en Navbar si el usuario es admin
+```
+
+---
+
+## 💡 MI RECOMENDACIÓN
+
+### ¿Cómo debe llegar el admin al panel?
+
+**Opción A (Simple):**
+1. El admin conoce la URL `/admin`
+2. Al entrar, el sistema verifica su rol
+3. Si no es admin → redirigir a `/dashboard`
+
+**Opción B (Premium):**
+1. En el Navbar, SOLO si es admin, aparece un botón "Admin"
+2. Al hacer clic → `/admin`
+3. Si alguien escribe `/admin` manualmente, igual verifica rol
+
+---
+
+## 🔧 MEJORAS QUE DEBO HACER A TU ADMIN PAGE
+
+| Mejora | Prioridad |
+|--------|-----------|
+| Verificar rol de admin al cargar | 🔴 ALTA |
+| Usar `NEXT_PUBLIC_API_URL` en lugar de hardcode | 🔴 ALTA |
+| Rediseñar con estilo premium | 🟡 MEDIA |
+| Feedback visual al aprobar/rechazar | 🟡 MEDIA |
+| Mostrar estadísticas de organizadores | 🟢 BAJA |
+
+---
+
+## ❓ PREGUNTA PARA TI
+
+**¿Cómo quieres que funcione el acceso al Admin?**
+
+1. **Solo con URL conocida** (tú la compartes a quien quieras)
+   - Cualquiera que conozca `/admin` puede entrar
+   - ❌ Menos seguro
+
+2. **Con verificación de rol en el backend**
+   - Solo usuarios con `role: "admin"` pueden entrar
+   - ✅ Más seguro y profesional
+
+3. **Botón en Navbar SOLO para admins**
+   - El botón aparece automáticamente si eres admin
+   - ✅ La mejor experiencia de usuario
+
+**Mi recomendación: Opción 2 + 3 combinadas.**
+
+---
+
+**¿Quieres que mejore el Admin Page con estas protecciones y diseño premium?**
