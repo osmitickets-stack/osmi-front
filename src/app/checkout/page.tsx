@@ -1,3 +1,5 @@
+//src/app/checkout/page.tsx
+
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -148,7 +150,7 @@ function CheckoutInfoStep({
   isCreatingPayment,
   error,
 }: {
-  onContinue: (email: string) => void;
+  onContinue: (email: string, name: string) => void;
   isCreatingPayment: boolean;
   error: string | null;
 }) {
@@ -212,7 +214,10 @@ function CheckoutInfoStep({
 
     localStorage.setItem("osmi_checkout_email", email.trim().toLowerCase());
     localStorage.setItem("osmi_checkout_name", name.trim());
-    onContinue(email.trim().toLowerCase());
+    onContinue(
+    email.trim().toLowerCase(),
+    name.trim()
+    );
   }
 
   return (
@@ -411,11 +416,13 @@ function CheckoutInfoStep({
 // ============================================================
 function PaymentStep({
   clientSecret,
+  orderId,
   onBack,
   email,
   name,
 }: {
   clientSecret: string;
+  orderId: string;
   onBack: () => void;
   email: string;
   name: string;
@@ -436,13 +443,27 @@ function PaymentStep({
         },
       }}
     >
-      <PaymentForm onBack={onBack} email={email} name={name} />
+      <PaymentForm
+        orderId={orderId}
+        onBack={onBack}
+        email={email}
+        name={name}
+      />
     </Elements>
   );
 }
 
-function PaymentForm({ onBack, email, name }: { onBack: () => void; email: string; name: string }) {
-  const router = useRouter();
+function PaymentForm({
+  orderId,
+  onBack,
+  email,
+  name,
+}: {
+  orderId: string;
+  onBack: () => void;
+  email: string;
+  name: string;
+}) {  const router = useRouter();
   const stripe = useStripe();
   const elements = useElements();
   const { tickets, validateStock, clearCart } = useCartStore();
@@ -466,7 +487,7 @@ function PaymentForm({ onBack, email, name }: { onBack: () => void; email: strin
       elements,
       redirect: "always",
       confirmParams: {
-        return_url: `${window.location.origin}/success`,
+        return_url:`${window.location.origin}/success?order_id=${encodeURIComponent(orderId)}`,
       },
     });
 
@@ -663,9 +684,12 @@ export default function CheckoutPage() {
     }
   }, [tickets, router]);
 
-  const handleContinue = async (email: string) => {
+  const handleContinue = async (email: string, name: string) => {
     setIsCreatingPayment(true);
     setError(null);
+
+    setCustomerEmail(email);
+    setCustomerName(name);
 
     try {
       const customerId = await resolveCustomerId(email);
@@ -682,7 +706,7 @@ export default function CheckoutPage() {
           quantity: t.quantity,
         })),
         customer_email: email,
-        customer_name: "Invitado",
+        customer_name: name,
       });
 
       const newOrderId = order.public_id || order.publicId || order.id;
@@ -746,13 +770,14 @@ export default function CheckoutPage() {
           error={error}
         />
       )}
-      {step === "payment" && clientSecret && (
+      {step === "payment" && clientSecret && orderId && (
         <PaymentStep
           clientSecret={clientSecret}
+          orderId={orderId}
           onBack={() => setStep("info")}
           email={customerEmail}
           name={customerName}
-        />
+         />
       )}
       <Footer />
     </div>
