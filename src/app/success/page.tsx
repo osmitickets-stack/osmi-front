@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
@@ -87,7 +87,7 @@ function formatMoney(amount: number, currency: string) {
   }).format(amount);
 }
 
-export default function SuccessPage() {
+function SuccessPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const clearCart = useCartStore((state) => state.clearCart);
@@ -462,5 +462,34 @@ export default function SuccessPage() {
 
       <Footer />
     </div>
+  );
+}
+
+export default function SuccessPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex flex-col bg-black">
+          <Navbar />
+          <main className="flex-1 flex items-center justify-center px-4">
+            <div className="glass-card max-w-xl w-full p-10 text-center border border-white/10">
+              <Loader2
+                size={48}
+                className="animate-spin text-primary mx-auto mb-6"
+              />
+              <h1 className="text-3xl font-black text-foreground mb-3">
+                Preparando confirmación
+              </h1>
+              <p className="text-muted">
+                Estamos cargando la información de tu compra.
+              </p>
+            </div>
+          </main>
+          <Footer />
+        </div>
+      }
+    >
+      <SuccessPageContent />
+    </Suspense>
   );
 }
