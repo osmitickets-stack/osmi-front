@@ -6,10 +6,19 @@ interface RequestOptions {
   method?: "GET" | "POST" | "PATCH" | "DELETE";
   body?: any;
   token?: string;
+  signal?: AbortSignal;
+  cache?: RequestCache;
+}
+
+export class ApiError extends Error {
+  constructor(public readonly status: number, message: string) {
+    super(message);
+    this.name = "ApiError";
+  }
 }
 
 async function request<T = any>(endpoint: string, options: RequestOptions = {}): Promise<T> {
-  const { method = "GET", body, token } = options;
+  const { method = "GET", body, token, signal, cache } = options;
   const url = `${API_URL}${endpoint}`;
 
   const headers: Record<string, string> = {
@@ -24,12 +33,14 @@ async function request<T = any>(endpoint: string, options: RequestOptions = {}):
     method,
     headers,
     body: body ? JSON.stringify(body) : undefined,
+    signal,
+    cache,
   });
 
   if (!response.ok) {
     const errorText = await response.text();
     console.error(`❌ API Error [${method} ${endpoint}]:`, response.status, errorText);
-    throw new Error(`API Error ${response.status}: ${errorText}`);
+    throw new ApiError(response.status, `API Error ${response.status}: ${errorText}`);
   }
 
   if (response.status === 204) {
@@ -41,11 +52,11 @@ async function request<T = any>(endpoint: string, options: RequestOptions = {}):
 }
 
 export const api = {
-  get: <T = any>(endpoint: string, token?: string) =>
-    request<T>(endpoint, { method: "GET", token }),
+  get: <T = any>(endpoint: string, token?: string, options?: Pick<RequestOptions, "signal" | "cache">) =>
+    request<T>(endpoint, { method: "GET", token, ...options }),
 
-  post: <T = any>(endpoint: string, body?: any, token?: string) =>
-    request<T>(endpoint, { method: "POST", body, token }),
+  post: <T = any>(endpoint: string, body?: any, token?: string, options?: Pick<RequestOptions, "signal" | "cache">) =>
+    request<T>(endpoint, { method: "POST", body, token, ...options }),
 
   patch: <T = any>(endpoint: string, body?: any, token?: string) =>
     request<T>(endpoint, { method: "PATCH", body, token }),
