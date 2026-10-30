@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Navbar } from "@/components/navigation/Navbar";
 import { Ticket, Calendar, MapPin } from "lucide-react";
 
@@ -20,11 +21,6 @@ export default function DashboardPage() {
   const [tickets, setTickets] = useState<UserTicket[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
-
-  useEffect(() => {
-    fetchUserTickets();
-    checkAdminStatus();
-  }, []);
 
   const checkAdminStatus = () => {
     const token = getCookie("token");
@@ -87,7 +83,7 @@ export default function DashboardPage() {
   const fetchUserTickets = async () => {
     try {
       const token = getCookie("token");
-      const res = await fetch("http://localhost:8083/v1/tickets", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8083"}/v1/tickets`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
@@ -104,6 +100,14 @@ export default function DashboardPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      void fetchUserTickets();
+      checkAdminStatus();
+    });
+    return () => cancelAnimationFrame(frame);
+  }, []);
 
 const formatDate = (dateStr: string): string => {
   if (!dateStr) return "Fecha por confirmar";
@@ -149,6 +153,9 @@ const formatDate = (dateStr: string): string => {
                 Panel Admin
              </button>
            )}
+           <Link href="/dashboard/scanner" className="rounded-full border border-primary/40 px-6 py-2.5 text-sm font-semibold text-primary hover:bg-primary/10 transition-all">
+             Control de acceso
+           </Link>
            <button
               onClick={handleLogout}
               className="rounded-full bg-white/10 px-6 py-2.5 text-sm font-semibold text-foreground hover:bg-white/20 transition-all"
