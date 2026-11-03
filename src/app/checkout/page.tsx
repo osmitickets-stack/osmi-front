@@ -14,7 +14,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import { Navbar } from "@/components/navigation/Navbar";
 import { Footer } from "@/components/navigation/Footer";
 import { useCartStore } from "@/store/cart";
-import { api } from "@/lib/api";
+import { API_BASE_URL, api } from "@/lib/api";
 import {
   AlertCircle,
   Lock,
@@ -38,8 +38,6 @@ import {
 } from "lucide-react";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_KEY!);
-const API = process.env.NEXT_PUBLIC_API_URL!;
-
 function getCookie(name: string) {
   if (typeof document === "undefined") return null;
   const value = `; ${document.cookie}`;
@@ -61,7 +59,7 @@ async function resolveCustomerId(customerEmail: string) {
   // Usuario logueado
   if (token) {
     try {
-      const userRes = await fetch(`${API}/v1/auth/me`, {
+      const userRes = await fetch(`${API_BASE_URL}/v1/auth/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       let userId = null;
@@ -76,7 +74,7 @@ async function resolveCustomerId(customerEmail: string) {
         } catch (e) { /* ignorar */ }
       }
       if (userId) {
-        const customerRes = await fetch(`${API}/v1/customers?user_id=${userId}`, {
+        const customerRes = await fetch(`${API_BASE_URL}/v1/customers?user_id=${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (customerRes.ok) {
@@ -86,7 +84,7 @@ async function resolveCustomerId(customerEmail: string) {
             return customers[0].publicId || customers[0].public_id || String(customers[0].id);
           }
         }
-        const createRes = await fetch(`${API}/v1/customers`, {
+        const createRes = await fetch(`${API_BASE_URL}/v1/customers`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -112,7 +110,7 @@ async function resolveCustomerId(customerEmail: string) {
   // Invitado: buscar primero por email
   try {
     const searchRes = await fetch(
-      `${API}/v1/customers?email=${encodeURIComponent(cleanEmail)}`
+      `${API_BASE_URL}/v1/customers?email=${encodeURIComponent(cleanEmail)}`
     );
     if (searchRes.ok) {
       const data = await searchRes.json();
@@ -122,7 +120,7 @@ async function resolveCustomerId(customerEmail: string) {
       }
     }
 
-    const guestRes = await fetch(`${API}/v1/customers`, {
+    const guestRes = await fetch(`${API_BASE_URL}/v1/customers`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

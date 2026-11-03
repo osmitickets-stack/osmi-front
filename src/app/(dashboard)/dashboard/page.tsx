@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Navbar } from "@/components/navigation/Navbar";
 import { Ticket, Calendar, MapPin } from "lucide-react";
+import { API_BASE_URL } from "@/lib/api";
 
 interface UserTicket {
   ticket_id: string;
@@ -40,7 +41,7 @@ export default function DashboardPage() {
       const payload = JSON.parse(atob(token.split(".")[1]));
       const userId = payload.user_id;
 
-      const checkRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/organizers?user_id=${userId}`);
+      const checkRes = await fetch(`${API_BASE_URL}/v1/organizers?user_id=${userId}`);
       const checkData = await checkRes.json();
       
       if (checkData.organizers?.length > 0) {
@@ -56,7 +57,7 @@ export default function DashboardPage() {
         return;
       }
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/organizers`, {
+      const res = await fetch(`${API_BASE_URL}/v1/organizers`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -83,7 +84,7 @@ export default function DashboardPage() {
   const fetchUserTickets = async () => {
     try {
       const token = getCookie("token");
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8083"}/v1/tickets`, {
+      const res = await fetch(`${API_BASE_URL}/v1/tickets`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {

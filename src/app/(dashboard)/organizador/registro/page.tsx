@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Navbar } from "@/components/navigation/Navbar";
+import { API_BASE_URL } from "@/lib/api";
 import { Footer } from "@/components/navigation/Footer";
 import {
   Building2,
@@ -100,7 +101,7 @@ export default function OrganizadorRegistroPage() {
 
   const fetchUserData = async (token: string) => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/auth/me`, {
+      const res = await fetch(`${API_BASE_URL}/v1/auth/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
@@ -177,7 +178,7 @@ export default function OrganizadorRegistroPage() {
         const userId = payload.user_id;
 
         // Registrar como organizador (usando endpoint existente)
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/organizers`, {
+        const res = await fetch(`${API_BASE_URL}/v1/organizers`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

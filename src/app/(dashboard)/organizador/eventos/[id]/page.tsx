@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { Navbar } from "@/components/navigation/Navbar";
+import { API_BASE_URL } from "@/lib/api";
 import { Footer } from "@/components/navigation/Footer";
 import {
   Calendar,
@@ -140,7 +141,7 @@ export default function EventDetailPage() {
       }
 
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/v1/events/${eventId}`,
+        `${API_BASE_URL}/v1/events/${eventId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -235,7 +236,7 @@ export default function EventDetailPage() {
       }
 
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/v1/events/${eventId}`,
+        `${API_BASE_URL}/v1/events/${eventId}`,
         {
           method: "PUT",
           headers: {
@@ -288,7 +289,7 @@ export default function EventDetailPage() {
       if (!token) return;
 
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/v1/events/${eventId}/status`,
+        `${API_BASE_URL}/v1/events/${eventId}/status`,
         {
           method: "PATCH",
           headers: {
@@ -321,7 +322,7 @@ export default function EventDetailPage() {
       if (!token) return;
 
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/v1/events/${eventId}`,
+        `${API_BASE_URL}/v1/events/${eventId}`,
         {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Ticket, LogOut, Menu, X, Search, Building2 } from "lucide-react";
+import { API_BASE_URL } from "@/lib/api";
 
 function getCookie(name: string): string | null {
   if (typeof document === "undefined") return null;
@@ -38,7 +39,7 @@ export const Navbar = () => {
       const userId = payload.user_id;
 
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/v1/organizers?user_id=${userId}`,
+        `${API_BASE_URL}/v1/organizers?user_id=${userId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }

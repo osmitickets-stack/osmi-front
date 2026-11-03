@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Navbar } from "@/components/navigation/Navbar";
+import { API_BASE_URL } from "@/lib/api";
 import { Footer } from "@/components/navigation/Footer";
 import {
   Calendar,
@@ -105,7 +106,7 @@ export default function OrganizadorDashboardPage() {
 
       // Obtener el organizer_id
       const orgRes = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/v1/organizers?user_id=${userId}`,
+        `${API_BASE_URL}/v1/organizers?user_id=${userId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -121,7 +122,7 @@ export default function OrganizadorDashboardPage() {
 
       // Obtener eventos del organizador
       const eventsRes = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/v1/events?organizer_id=${organizerId}`,
+        `${API_BASE_URL}/v1/events?organizer_id=${organizerId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }

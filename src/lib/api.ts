@@ -1,6 +1,8 @@
 // src/lib/api.ts — Cliente HTTP para el backend gRPC-Gateway
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8083";
+export const API_BASE_URL = (
+  process.env.NEXT_PUBLIC_API_URL?.trim() || "http://localhost:8083"
+).replace(/\/+$/, "");
 
 interface RequestOptions {
   method?: "GET" | "POST" | "PATCH" | "DELETE";
@@ -19,7 +21,7 @@ export class ApiError extends Error {
 
 async function request<T = any>(endpoint: string, options: RequestOptions = {}): Promise<T> {
   const { method = "GET", body, token, signal, cache } = options;
-  const url = `${API_URL}${endpoint}`;
+  const url = `${API_BASE_URL}${endpoint}`;
 
   const headers: Record<string, string> = {
     "Content-Type": "application/json",

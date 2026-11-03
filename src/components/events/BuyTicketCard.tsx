@@ -10,6 +10,7 @@ import {
 
 import { useCartStore } from "@/store/cart";
 import { useEffect, useState } from "react";
+import { API_BASE_URL } from "@/lib/api";
 
 interface TicketType {
   id: string;
@@ -54,7 +55,7 @@ export default function BuyTicketCard({
     async function fetchTicketTypes() {
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/v1/ticket-types?event_id=${eventId}`
+          `${API_BASE_URL}/v1/ticket-types?event_id=${eventId}`
         );
 
         if (!res.ok)
