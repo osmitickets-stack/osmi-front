@@ -1,15 +1,16 @@
 import Link from "next/link";
 import { MessageCircle } from "lucide-react";
+import { CATEGORIES } from "@/lib/categories";
 
 export const Footer = () => {
   return (
     <footer className="border-t border-white/5 bg-background-secondary/30 mt-auto">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12 md:py-16">
         {/* Grid principal - RESPONSIVE: 3 columnas en móvil */}
-        <div className="grid grid-cols-3 gap-4 sm:gap-6 md:gap-8 lg:gap-10">
+        <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4 sm:gap-8 lg:gap-10">
           
           {/* ==================== MARCA (ocupa toda la fila en móvil) ==================== */}
-          <div className="col-span-3 md:col-span-1 space-y-3 sm:space-y-4">
+          <div className="col-span-2 sm:col-span-3 lg:col-span-1 space-y-3 sm:space-y-4">
             <Link href="/" className="text-2xl sm:text-3xl font-black text-gradient tracking-tight">
               osmi
             </Link>
@@ -79,11 +80,13 @@ export const Footer = () => {
               Explorar
             </h4>
             <ul className="space-y-1.5 sm:space-y-2.5">
-              <li><Link href="/events" className="text-[11px] sm:text-sm text-muted-dark hover:text-foreground transition-colors">Conciertos</Link></li>
-              <li><Link href="/events" className="text-[11px] sm:text-sm text-muted-dark hover:text-foreground transition-colors">Deportes</Link></li>
-              <li><Link href="/events" className="text-[11px] sm:text-sm text-muted-dark hover:text-foreground transition-colors">Teatro</Link></li>
-              <li><Link href="/events" className="text-[11px] sm:text-sm text-muted-dark hover:text-foreground transition-colors">Festivales</Link></li>
-              <li><Link href="/events" className="text-[11px] sm:text-sm text-muted-dark hover:text-foreground transition-colors">Experiencias</Link></li>
+              {CATEGORIES.map((category) => (
+                <li key={category.slug}>
+                  <Link href={`/events?category=${category.slug}`} className="text-xs sm:text-sm text-muted-dark hover:text-foreground transition-colors">
+                    {category.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -101,6 +104,11 @@ export const Footer = () => {
               <li>
                 <Link href="/para-organizadores" className="text-[11px] sm:text-sm text-muted-dark hover:text-foreground transition-colors">
                   Para organizadores
+                </Link>
+              </li>
+              <li>
+                <Link href="/ayuda" className="text-xs sm:text-sm text-muted-dark hover:text-foreground transition-colors">
+                  Ayuda y reembolsos
                 </Link>
               </li>
               <li>
