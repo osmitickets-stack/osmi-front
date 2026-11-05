@@ -43,7 +43,38 @@ type OrderConfirmation = {
 
 type ConfirmationState = "processing" | "completed" | "error";
 
-function normalizeConfirmation(data: any): OrderConfirmation {
+type RawConfirmationItem = {
+  ticketTypeId?: string;
+  ticket_type_id?: string;
+  ticketTypeName?: string;
+  ticket_type_name?: string;
+  quantity?: number;
+  unitPrice?: number;
+  unit_price?: number;
+  totalPrice?: number;
+  total_price?: number;
+  eventName?: string;
+  event_name?: string;
+};
+
+type RawConfirmation = {
+  orderId?: string;
+  order_id?: string;
+  orderStatus?: string;
+  order_status?: string;
+  paymentStatus?: string;
+  payment_status?: string;
+  customerEmail?: string;
+  customer_email?: string;
+  customerName?: string;
+  customer_name?: string;
+  totalAmount?: number;
+  total_amount?: number;
+  currency?: string;
+  items?: RawConfirmationItem[];
+};
+
+function normalizeConfirmation(data: RawConfirmation): OrderConfirmation {
   return {
     orderId: data.orderId ?? data.order_id ?? "",
     orderStatus: data.orderStatus ?? data.order_status ?? "",
@@ -52,7 +83,7 @@ function normalizeConfirmation(data: any): OrderConfirmation {
     customerName: data.customerName ?? data.customer_name ?? "",
     totalAmount: Number(data.totalAmount ?? data.total_amount ?? 0),
     currency: data.currency ?? "MXN",
-    items: (data.items ?? []).map((item: any) => ({
+    items: (data.items ?? []).map((item: RawConfirmationItem) => ({
       ticketTypeId:
         item.ticketTypeId ??
         item.ticket_type_id ??
@@ -132,7 +163,7 @@ function SuccessPageContent() {
         if (cancelled) return;
 
         try {
-          const response = await api.get<any>(
+          const response = await api.get<RawConfirmation>(
             `/v1/orders/${encodeURIComponent(
               orderId
             )}/confirmation?payment_intent_id=${encodeURIComponent(
@@ -265,6 +296,9 @@ function SuccessPageContent() {
             >
               Intentar nuevamente
             </button>
+            <Link href="/ayuda" className="mt-4 inline-flex min-h-11 items-center justify-center px-4 text-sm font-semibold text-primary hover:underline">
+              Contactar a soporte
+            </Link>
           </div>
         </main>
 
@@ -445,6 +479,9 @@ function SuccessPageContent() {
                 Orden completada
               </span>
             </div>
+            <Link href="/ayuda" className="mt-6 inline-flex min-h-11 items-center justify-center text-sm font-semibold text-primary hover:underline">
+              ¿Necesitas ayuda con tu compra?
+            </Link>
           </div>
         </div>
 

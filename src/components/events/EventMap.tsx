@@ -4,12 +4,11 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
-// Corregir iconos de Leaflet en Next.js
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
-  iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
-  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
+const markerIcon = L.divIcon({
+  className: "osmi-map-marker",
+  html: '<span aria-hidden="true"></span>',
+  iconSize: [28, 28],
+  iconAnchor: [14, 14],
 });
 
 interface EventMapProps {
@@ -19,16 +18,32 @@ interface EventMapProps {
 }
 
 export default function EventMap({ location, latitude, longitude }: EventMapProps) {
-  // Coordenadas por defecto (Ciudad de México) si no hay lat/lng
-  const defaultLat = 19.4326;
-  const defaultLng = -99.1332;
-  const zoom = 13;
+  const searchableLocation = location && location !== "Próximamente" && location !== "Ubicación";
+  const hasCoordinates =
+    typeof latitude === "number" && Number.isFinite(latitude) && latitude >= -90 && latitude <= 90 &&
+    typeof longitude === "number" && Number.isFinite(longitude) && longitude >= -180 && longitude <= 180;
+
+  if (!hasCoordinates) {
+    return (
+      <div className="flex min-h-64 flex-col items-center justify-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-5 text-center">
+        <p className="font-semibold text-foreground">Mapa pendiente de ubicación exacta</p>
+        <p className="max-w-sm text-sm text-muted">{searchableLocation ? location : "El organizador aún no ha publicado las coordenadas del recinto."}</p>
+        {searchableLocation && (
+          <a className="text-sm font-semibold text-accent underline-offset-4 hover:underline" href={`https://www.openstreetmap.org/search?query=${encodeURIComponent(location)}`} target="_blank" rel="noopener noreferrer">
+            Buscar esta ubicación en OpenStreetMap
+          </a>
+        )}
+      </div>
+    );
+  }
+
+  const position: [number, number] = [latitude!, longitude!];
 
   return (
     <div className="w-full h-64 rounded-2xl overflow-hidden border border-white/[0.06]">
       <MapContainer
-        center={[latitude || defaultLat, longitude || defaultLng]}
-        zoom={zoom}
+        center={position}
+        zoom={13}
         scrollWheelZoom={false}
         className="w-full h-full"
         style={{ background: "#0b0618" }}
@@ -37,7 +52,7 @@ export default function EventMap({ location, latitude, longitude }: EventMapProp
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
         />
-        <Marker position={[latitude || defaultLat, longitude || defaultLng]}>
+        <Marker position={position} icon={markerIcon}>
           <Popup>{location}</Popup>
         </Marker>
       </MapContainer>

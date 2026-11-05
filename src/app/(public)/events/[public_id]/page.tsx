@@ -16,6 +16,7 @@ import { api } from "@/lib/api";
 import {
   normalizeEvent,
   type NormalizedEvent,
+  type RawEvent,
 } from "@/modules/events/utils/normalizer";
 
 // ============================================================
@@ -24,13 +25,8 @@ import {
 const getEvent = cache(
   async (public_id: string): Promise<NormalizedEvent | null> => {
     try {
-      const raw = await api.get<any>(`/v1/events/${public_id}`);
-      const normalized = normalizeEvent(raw);
-      return {
-        ...normalized,
-        latitude: raw.latitude ?? normalized.latitude,
-        longitude: raw.longitude ?? normalized.longitude,
-      };
+      const raw = await api.get<RawEvent>(`/v1/events/${public_id}`);
+      return normalizeEvent(raw);
     } catch (error) {
       console.error("Error fetching event:", error);
       return null;
@@ -239,8 +235,8 @@ export default async function EventPage({
               <div className="rounded-xl overflow-hidden border border-white/10">
                 <EventMapWrapper 
                   location={event.location || "Ubicación"} 
-                  latitude={event.latitude ?? 20.7335} 
-                  longitude={event.longitude ?? -103.3811}
+                  latitude={event.latitude}
+                  longitude={event.longitude}
                 />
               </div>
             </div>

@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Navbar } from "@/components/navigation/Navbar";
 import { Ticket, Calendar, MapPin } from "lucide-react";
+import { API_BASE_URL } from "@/lib/api";
 
 interface UserTicket {
   ticket_id: string;
@@ -19,12 +21,8 @@ export default function DashboardPage() {
   const router = useRouter();
   const [tickets, setTickets] = useState<UserTicket[]>([]);
   const [loading, setLoading] = useState(true);
+  const [ticketsError, setTicketsError] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
-
-  useEffect(() => {
-    fetchUserTickets();
-    checkAdminStatus();
-  }, []);
 
   const checkAdminStatus = () => {
     const token = getCookie("token");
@@ -44,7 +42,7 @@ export default function DashboardPage() {
       const payload = JSON.parse(atob(token.split(".")[1]));
       const userId = payload.user_id;
 
-      const checkRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/organizers?user_id=${userId}`);
+      const checkRes = await fetch(`${API_BASE_URL}/v1/organizers?user_id=${userId}`);
       const checkData = await checkRes.json();
       
       if (checkData.organizers?.length > 0) {
@@ -60,7 +58,7 @@ export default function DashboardPage() {
         return;
       }
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/organizers`, {
+      const res = await fetch(`${API_BASE_URL}/v1/organizers`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -85,25 +83,41 @@ export default function DashboardPage() {
   };
 
   const fetchUserTickets = async () => {
+    setLoading(true);
+    setTicketsError("");
     try {
       const token = getCookie("token");
-      const res = await fetch("http://localhost:8083/v1/tickets", {
+      if (!token) {
+        setTicketsError("Inicia sesión para consultar tus boletos.");
+        return;
+      }
+      const res = await fetch(`${API_BASE_URL}/v1/tickets`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (res.ok) {
-        const data = await res.json();
-        const allTickets = Array.isArray(data) ? data : data.tickets || [];
-        const filtered = allTickets.filter(
-          (t: UserTicket) => t.status === "sold" || t.status === "checked_in" || t.status === "used"
-        );
-        setTickets(filtered);
+      if (!res.ok) {
+        throw new Error(`No se pudieron consultar los boletos (${res.status}).`);
       }
+      const data = await res.json();
+      const allTickets = Array.isArray(data) ? data : data.tickets || [];
+      const filtered = allTickets.filter(
+        (t: UserTicket) => t.status === "sold" || t.status === "checked_in" || t.status === "used"
+      );
+      setTickets(filtered);
     } catch (err) {
       console.error("Error fetching tickets:", err);
+      setTicketsError("No pudimos cargar tus boletos. Vuelve a intentarlo; tus compras no se han modificado.");
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      void fetchUserTickets();
+      checkAdminStatus();
+    });
+    return () => cancelAnimationFrame(frame);
+  }, []);
 
 const formatDate = (dateStr: string): string => {
   if (!dateStr) return "Fecha por confirmar";
@@ -128,13 +142,13 @@ const formatDate = (dateStr: string): string => {
   return (
     <div className="min-h-screen">
       <Navbar />
-      <main className="max-w-7xl mx-auto px-4 py-12">
-        <div className="flex items-center justify-between mb-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between mb-8">
           <div>
-            <h1 className="text-4xl font-bold">Mis Boletos</h1>
+            <h1 className="text-3xl sm:text-4xl font-bold">Mis Boletos</h1>
             <p className="text-muted mt-1">Gestiona tus experiencias</p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-2 sm:gap-3">
             <button
               onClick={() => router.push("/organizador")}
               className="rounded-full bg-primary/10 px-6 py-2.5 text-sm font-semibold text-primary hover:bg-primary/20 transition-all border border-primary/20"
@@ -149,6 +163,9 @@ const formatDate = (dateStr: string): string => {
                 Panel Admin
              </button>
            )}
+           <Link href="/dashboard/scanner" className="rounded-full border border-primary/40 px-6 py-2.5 text-sm font-semibold text-primary hover:bg-primary/10 transition-all">
+             Control de acceso
+           </Link>
            <button
               onClick={handleLogout}
               className="rounded-full bg-white/10 px-6 py-2.5 text-sm font-semibold text-foreground hover:bg-white/20 transition-all"
@@ -161,6 +178,15 @@ const formatDate = (dateStr: string): string => {
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3].map((i) => (<div key={i} className="glass-card h-48 animate-pulse" />))}
+          </div>
+        ) : ticketsError ? (
+          <div className="glass-card p-8 text-center" role="alert">
+            <h2 className="text-xl font-bold mb-2">No pudimos mostrar tus boletos</h2>
+            <p className="text-muted mb-5">{ticketsError}</p>
+            <button onClick={() => void fetchUserTickets()} className="rounded-full bg-primary px-6 py-3 text-sm font-bold text-white hover:bg-primary/90">
+              Intentar de nuevo
+            </button>
+            <Link href="/ayuda" className="ml-4 inline-flex min-h-11 items-center text-sm font-semibold text-primary hover:underline">Pedir ayuda</Link>
           </div>
         ) : tickets.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

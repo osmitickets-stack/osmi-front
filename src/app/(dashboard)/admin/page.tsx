@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/navigation/Navbar";
 import { Shield, CheckCircle, XCircle } from "lucide-react";
+import { API_BASE_URL } from "@/lib/api";
 
 interface OrganizerRequest {
   public_uuid: string;
@@ -25,7 +26,7 @@ export default function AdminPage() {
   const fetchRequests = async () => {
     try {
       const token = getCookie("token");
-      const res = await fetch("http://localhost:8083/v1/organizers", {
+      const res = await fetch(`${API_BASE_URL}/v1/organizers`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
@@ -41,7 +42,7 @@ export default function AdminPage() {
 
   const handleApprove = async (publicUuid: string) => {
     const token = getCookie("token");
-    await fetch(`http://localhost:8083/v1/organizers/${publicUuid}`, {
+    await fetch(`${API_BASE_URL}/v1/organizers/${publicUuid}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify({ approval_status: "approved" }),
@@ -51,7 +52,7 @@ export default function AdminPage() {
 
   const handleReject = async (publicUuid: string) => {
     const token = getCookie("token");
-    await fetch(`http://localhost:8083/v1/organizers/${publicUuid}`, {
+    await fetch(`${API_BASE_URL}/v1/organizers/${publicUuid}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify({ approval_status: "rejected" }),

@@ -98,7 +98,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
           </div>
 
           {/* ==================== CATEGORÍAS ==================== */}
-          <div className="flex flex-wrap gap-2 mb-8">
+          <div id="categorias" className="flex flex-wrap gap-2 mb-8 scroll-mt-24">
             <Link
               href="/events"
               className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${

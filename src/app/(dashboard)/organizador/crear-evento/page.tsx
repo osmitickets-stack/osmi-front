@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Navbar } from "@/components/navigation/Navbar";
+import { API_BASE_URL } from "@/lib/api";
 import { Footer } from "@/components/navigation/Footer";
 import {
   Calendar,
@@ -85,7 +86,7 @@ export default function CrearEventoPage() {
     const payload = JSON.parse(atob(token.split(".")[1]));
     const userId = payload.user_id;
 
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/organizers?user_id=${userId}`, {
+    fetch(`${API_BASE_URL}/v1/organizers?user_id=${userId}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
@@ -150,7 +151,7 @@ export default function CrearEventoPage() {
         return;
       }
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/events`, {
+      const res = await fetch(`${API_BASE_URL}/v1/events`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
