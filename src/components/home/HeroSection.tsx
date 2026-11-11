@@ -6,26 +6,28 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   ArrowRight,
+  BadgePercent,
   CalendarDays,
   ChevronLeft,
   ChevronRight,
   Clock3,
   Compass,
-  Drama,
+  Gamepad2,
   Headphones,
+  Heart,
   Home,
   LifeBuoy,
   MapPin,
   Menu,
   Music2,
+  Radio,
   Search,
   ShieldCheck,
-  Sparkles,
   Ticket,
-  Trophy,
   UserRound,
   X,
 } from "lucide-react";
+import { API_BASE_URL } from "@/lib/api";
 import type { NormalizedEvent } from "@/modules/events/utils/normalizer";
 
 type HeroSectionProps = { events: NormalizedEvent[] };
@@ -35,6 +37,13 @@ type Countdown = {
   hours: number;
   minutes: number;
   seconds: number;
+};
+
+type ProfileSummary = {
+  loggedIn: boolean;
+  name: string;
+  email: string;
+  avatarUrl?: string;
 };
 
 const slides = [
@@ -64,13 +73,17 @@ const slides = [
   },
 ] as const;
 
-const primaryNavigation = [
-  { label: "Inicio", href: "/", icon: Home },
-  { label: "Explorar", href: "/events", icon: Compass },
-  { label: "Conciertos", href: "/events?category=conciertos", icon: Music2 },
-  { label: "Deportes", href: "/events?category=deportes", icon: Trophy },
-  { label: "Teatro", href: "/events?category=teatro", icon: Drama },
-  { label: "Festivales", href: "/events?category=festivales", icon: Sparkles },
+const pageNavigation = [
+  { id: "inicio", label: "Inicio", href: "#inicio", icon: Home },
+  { id: "categorias", label: "Explorar", href: "#categorias", icon: Compass },
+  { id: "conciertos", label: "Conciertos", href: "#conciertos", icon: Music2 },
+] as const;
+
+const discoveryNavigation = [
+  { label: "Favoritos", href: "/dashboard", icon: Heart },
+  { label: "Ofertas", href: "/events", icon: BadgePercent },
+  { label: "Ayuda", href: "/ayuda", icon: LifeBuoy },
+  { label: "Desfragmentado", href: "/desfragmentado", icon: Radio },
 ] as const;
 
 function calculateCountdown(date: string | undefined): Countdown {
@@ -83,6 +96,16 @@ function calculateCountdown(date: string | undefined): Countdown {
     minutes: Math.floor((difference / 60_000) % 60),
     seconds: Math.floor((difference / 1_000) % 60),
   };
+}
+
+function getCookie(name: string): string | null {
+  if (typeof document === "undefined") return null;
+  return document.cookie.split("; ").find((part) => part.startsWith(`${name}=`))?.slice(name.length + 1) ?? null;
+}
+
+function profileInitials(profile: ProfileSummary): string {
+  const source = profile.name || profile.email || "OSMI";
+  return source.split(/\s+|@/).filter(Boolean).slice(0, 2).map((part) => part[0]?.toUpperCase()).join("") || "OS";
 }
 
 function IconLink({ href, children, icon, onClick }: { href: string; children: ReactNode; icon: ReactNode; onClick?: () => void }) {
@@ -98,11 +121,11 @@ function IconLink({ href, children, icon, onClick }: { href: string; children: R
   );
 }
 
-function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
+function SidebarContent({ activeSection, onNavigate, profile }: { activeSection: string; onNavigate?: () => void; profile: ProfileSummary }) {
   return (
     <div className="flex h-full min-h-0 flex-col">
       <Link
-        href="/"
+        href="#inicio"
         onClick={onNavigate}
         aria-label="OSMI, inicio"
         className="mb-7 flex min-h-12 items-center gap-3 rounded-xl px-2 text-2xl font-black tracking-[-.06em] text-white focus-visible:outline-2 focus-visible:outline-[#ff2bd6]"
@@ -114,37 +137,67 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
       </Link>
 
       <nav aria-label="Navegación principal" className="space-y-1">
-        {primaryNavigation.map(({ href, icon: Icon, label }, index) => (
+        {pageNavigation.map(({ id, href, icon: Icon, label }) => {
+          const active = activeSection === id;
+          return (
           <Link
             key={href}
             href={href}
-            onClick={onNavigate}
+            aria-current={active ? "location" : undefined}
+            onClick={() => onNavigate?.()}
             className={`flex min-h-11 items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff2bd6] ${
-              index === 0
+              active
                 ? "border border-[#ff2bd6]/15 bg-gradient-to-r from-[#ff2bd6]/20 to-[#7b61ff]/10 text-white shadow-[inset_3px_0_0_#ff2bd6]"
                 : "text-white/62 hover:bg-white/[.06] hover:text-white"
             }`}
           >
-            <Icon size={18} className={`shrink-0 ${index === 0 ? "text-[#ff5ddd]" : "text-white/42"}`} />
+            <Icon size={18} className={`shrink-0 ${active ? "text-[#ff5ddd]" : "text-white/42"}`} />
             <span>{label}</span>
           </Link>
-        ))}
+          );
+        })}
       </nav>
 
-      <div className="my-5 h-px bg-gradient-to-r from-transparent via-white/12 to-transparent" />
+      <div className="my-4 h-px bg-gradient-to-r from-transparent via-white/12 to-transparent" />
+
+      <nav aria-label="Descubrir OSMI" className="space-y-1">
+        {discoveryNavigation.map(({ href, icon: Icon, label }) => (
+          <IconLink key={label} href={href} icon={<Icon size={18} />} onClick={onNavigate}>{label}</IconLink>
+        ))}
+        <span aria-disabled="true" title="Próximamente" className="flex min-h-11 cursor-not-allowed items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-white/34">
+          <Gamepad2 size={18} className="shrink-0" />
+          <span className="min-w-0">Minijuegos</span>
+          <span className="ml-auto rounded-full border border-[#9c69ff]/25 bg-[#9c69ff]/10 px-1.5 py-0.5 text-[8px] font-black uppercase tracking-wider text-[#c4a6ff]">Pronto</span>
+        </span>
+      </nav>
+
+      <div className="my-4 h-px bg-gradient-to-r from-transparent via-white/12 to-transparent" />
 
       <div className="space-y-1">
         <IconLink href="/dashboard" icon={<Ticket size={18} />} onClick={onNavigate}>Mis boletos</IconLink>
-        <IconLink href="/login" icon={<UserRound size={18} />} onClick={onNavigate}>Mi cuenta</IconLink>
-        <IconLink href="/ayuda" icon={<LifeBuoy size={18} />} onClick={onNavigate}>Ayuda y soporte</IconLink>
+        <IconLink href={profile.loggedIn ? "/dashboard" : "/login"} icon={<UserRound size={18} />} onClick={onNavigate}>{profile.loggedIn ? "Mi perfil" : "Mi cuenta"}</IconLink>
       </div>
 
-      <div className="mt-auto rounded-2xl border border-[#ff2bd6]/18 bg-[radial-gradient(circle_at_100%_0%,rgba(255,43,214,.16),transparent_48%),rgba(255,255,255,.025)] p-4">
+      <div className="mt-4 rounded-2xl border border-[#ff2bd6]/18 bg-[radial-gradient(circle_at_100%_0%,rgba(255,43,214,.16),transparent_48%),rgba(255,255,255,.025)] p-4 xl:mt-auto">
         <span className="inline-flex rounded-full bg-[#ff2bd6]/15 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[.18em] text-[#ff75e4]">OSMI Experience</span>
         <p className="mt-3 text-sm font-bold leading-5 text-white">Experiencias memorables, desde el primer clic.</p>
-        <Link href="/register" onClick={onNavigate} className="mt-4 inline-flex min-h-10 w-full items-center justify-center rounded-xl bg-[#ff2bd6] px-3 py-2 text-center text-xs font-black leading-4 text-[#17051b] transition hover:bg-[#ff73e3] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
-          Crear cuenta
-        </Link>
+        {profile.loggedIn ? (
+          <Link href="/dashboard" onClick={onNavigate} className="mt-4 flex min-h-14 w-full items-center gap-3 rounded-xl border border-white/10 bg-white/[.055] p-2.5 transition hover:border-[#ff2bd6]/35 hover:bg-white/[.08] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff2bd6]">
+            {profile.avatarUrl ? (
+              <span role="img" aria-label="Imagen de perfil" className="size-10 shrink-0 rounded-full border border-[#ff2bd6]/35 bg-cover bg-center" style={{ backgroundImage: `url(${JSON.stringify(profile.avatarUrl)})` }} />
+            ) : (
+              <span aria-label="Avatar de perfil" className="grid size-10 shrink-0 place-items-center rounded-full bg-gradient-to-br from-[#ff2bd6] to-[#714bff] text-xs font-black text-white">{profileInitials(profile)}</span>
+            )}
+            <span className="min-w-0 text-left">
+              <span className="block truncate text-xs font-black text-white">{profile.name || "Mi perfil"}</span>
+              <span className="mt-0.5 block truncate text-[10px] text-white/46">Ver cuenta y boletos</span>
+            </span>
+          </Link>
+        ) : (
+          <Link href="/register" onClick={onNavigate} className="mt-4 inline-flex min-h-10 w-full items-center justify-center rounded-xl bg-[#ff2bd6] px-3 py-2 text-center text-xs font-black leading-4 text-[#17051b] transition hover:bg-[#ff73e3] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
+            Crear cuenta
+          </Link>
+        )}
       </div>
     </div>
   );
@@ -175,6 +228,8 @@ export function HeroSection({ events }: HeroSectionProps) {
   const [slideIndex, setSlideIndex] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [activeSection, setActiveSection] = useState("inicio");
+  const [profile, setProfile] = useState<ProfileSummary>({ loggedIn: false, name: "", email: "" });
   const featured = events.find((event) => event.image_url) ?? events[0];
   const featuredDate = featured?.start_date;
   const [countdown, setCountdown] = useState<Countdown>(() => calculateCountdown(featuredDate));
@@ -194,6 +249,67 @@ export function HeroSection({ events }: HeroSectionProps) {
     return () => { document.body.style.overflow = previousOverflow; };
   }, [mobileMenuOpen]);
 
+  useEffect(() => {
+    let cancelled = false;
+    const frame = window.requestAnimationFrame(() => {
+      const token = getCookie("token");
+      if (!token) return;
+
+      let tokenEmail = "";
+      let tokenName = "";
+      try {
+        const payload = JSON.parse(atob(token.split(".")[1] ?? "")) as Record<string, unknown>;
+        tokenEmail = typeof payload.email === "string" ? payload.email : "";
+        tokenName = typeof payload.name === "string" ? payload.name : "";
+      } catch {
+        // El endpoint autenticado sigue siendo la fuente de verdad.
+      }
+
+      setProfile({ loggedIn: true, name: tokenName, email: tokenEmail });
+      void (async () => {
+        try {
+          const response = await fetch(`${API_BASE_URL}/v1/auth/me`, { headers: { Authorization: `Bearer ${token}` } });
+          if (!response.ok) return;
+          const data = await response.json() as Record<string, unknown>;
+          const rawAvatar = [data.avatar_url, data.avatarUrl, data.profile_image_url, data.profileImageUrl].find((value) => typeof value === "string") as string | undefined;
+          const avatarUrl = rawAvatar && /^https:\/\//i.test(rawAvatar) ? rawAvatar : undefined;
+          const name = [data.name, data.full_name, data.display_name, data.username].find((value) => typeof value === "string" && value.trim()) as string | undefined;
+          const email = typeof data.email === "string" ? data.email : tokenEmail;
+          if (!cancelled) setProfile({ loggedIn: true, name: name ?? tokenName, email, avatarUrl });
+        } catch {
+          // Conserva el perfil derivado de la sesión sin bloquear la portada.
+        }
+      })();
+    });
+    return () => { cancelled = true; window.cancelAnimationFrame(frame); };
+  }, []);
+
+  useEffect(() => {
+    let frame = 0;
+    const sectionIds = pageNavigation.map((item) => item.id);
+    const updateActiveSection = () => {
+      frame = 0;
+      const threshold = window.innerHeight * 0.35;
+      let current = sectionIds[0];
+      for (const id of sectionIds) {
+        const element = document.getElementById(id);
+        if (element && element.getBoundingClientRect().top <= threshold) current = id;
+      }
+      setActiveSection(current);
+    };
+    const onScroll = () => {
+      if (!frame) frame = window.requestAnimationFrame(updateActiveSection);
+    };
+    updateActiveSection();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (frame) window.cancelAnimationFrame(frame);
+    };
+  }, []);
+
   const submitSearch = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const query = search.trim();
@@ -204,12 +320,12 @@ export function HeroSection({ events }: HeroSectionProps) {
   const nextSlide = () => setSlideIndex((current) => (current + 1) % slides.length);
 
   return (
-    <section aria-label="Portada de OSMI" className="relative isolate overflow-hidden border-b border-white/[.06] bg-[#04020b]">
+    <section id="inicio" aria-label="Portada de OSMI" className="relative isolate scroll-mt-4 border-b border-white/[.06] bg-[#04020b]">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_54%_12%,rgba(81,34,171,.2),transparent_28%),radial-gradient(circle_at_88%_34%,rgba(255,43,214,.1),transparent_24%)]" />
 
-      <div className="relative mx-auto grid min-h-[760px] w-full max-w-[1680px] xl:grid-cols-[224px_minmax(0,1fr)]">
-        <aside className="hidden border-r border-white/[.07] bg-[#070510]/94 p-4 xl:block">
-          <SidebarContent />
+      <div className="relative mx-auto min-h-[760px] w-full max-w-[1920px] xl:pl-[224px]">
+        <aside className="fixed inset-y-0 left-0 z-40 hidden w-[224px] overflow-y-auto border-r border-white/[.07] bg-[#070510]/[.98] p-4 shadow-[18px_0_55px_rgba(0,0,0,.24)] xl:block">
+          <SidebarContent activeSection={activeSection} profile={profile} />
         </aside>
 
         <div className="min-w-0 p-3 sm:p-5 lg:p-6 xl:p-7">
@@ -224,7 +340,7 @@ export function HeroSection({ events }: HeroSectionProps) {
               <Menu size={21} />
             </button>
 
-            <Link href="/" aria-label="OSMI, inicio" className="mr-auto flex items-center gap-2 text-xl font-black tracking-[-.06em] text-white xl:hidden">
+            <Link href="#inicio" aria-label="OSMI, inicio" className="mr-auto flex items-center gap-2 text-xl font-black tracking-[-.06em] text-white xl:hidden">
               <span className="grid size-9 place-items-center rounded-xl bg-gradient-to-br from-[#ff36d7] to-[#7c3cff] text-[#100414]"><Ticket size={20} /></span>
               OSMI<span className="-ml-2 text-[#ff2bd6]">.</span>
             </Link>
@@ -291,7 +407,7 @@ export function HeroSection({ events }: HeroSectionProps) {
                 </div>
               </div>
 
-              <div className="absolute bottom-5 right-5 z-20 flex items-center gap-2 sm:bottom-7 sm:right-7">
+              <div className="absolute bottom-5 right-5 z-20 flex items-center gap-2 sm:inset-x-5 sm:bottom-auto sm:right-auto sm:top-1/2 sm:-translate-y-1/2 sm:justify-between">
                 <button type="button" onClick={previousSlide} aria-label="Anuncio anterior" className="grid size-11 place-items-center rounded-full border border-white/20 bg-black/45 text-white backdrop-blur-md transition hover:border-[#ff2bd6]/60 hover:bg-[#ff2bd6]/20 focus-visible:outline-2 focus-visible:outline-[#ff2bd6]"><ChevronLeft size={20} /></button>
                 <button type="button" onClick={nextSlide} aria-label="Anuncio siguiente" className="grid size-11 place-items-center rounded-full border border-white/20 bg-black/45 text-white backdrop-blur-md transition hover:border-[#ff2bd6]/60 hover:bg-[#ff2bd6]/20 focus-visible:outline-2 focus-visible:outline-[#ff2bd6]"><ChevronRight size={20} /></button>
               </div>
@@ -355,7 +471,7 @@ export function HeroSection({ events }: HeroSectionProps) {
           <button type="button" aria-label="Cerrar menú" onClick={() => setMobileMenuOpen(false)} className="absolute inset-0 bg-black/75 backdrop-blur-sm" />
           <aside className="relative h-full w-[min(88vw,320px)] overflow-y-auto border-r border-white/10 bg-[#070510] p-5 shadow-2xl">
             <button type="button" onClick={() => setMobileMenuOpen(false)} aria-label="Cerrar menú" className="absolute right-4 top-4 z-10 grid size-10 place-items-center rounded-xl border border-white/10 bg-white/[.04] text-white"><X size={20} /></button>
-            <SidebarContent onNavigate={() => setMobileMenuOpen(false)} />
+            <SidebarContent activeSection={activeSection} profile={profile} onNavigate={() => setMobileMenuOpen(false)} />
           </aside>
         </div>
       )}
