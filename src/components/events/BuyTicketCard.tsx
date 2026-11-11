@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { API_BASE_URL } from "@/lib/api";
 import {
   Plus,
   Minus,
@@ -10,7 +11,6 @@ import {
 
 import { useCartStore } from "@/store/cart";
 import { useEffect, useState } from "react";
-import { API_BASE_URL } from "@/lib/api";
 
 interface TicketType {
   id: string;
@@ -192,7 +192,7 @@ export default function BuyTicketCard({
 
   return (
     <div className="lg:sticky lg:top-24">
-      <div className="glass-card p-6 space-y-6 glow-primary max-h-[calc(100vh-120px)] overflow-y-auto">
+      <div className="rounded-3xl border border-primary/20 bg-[#141026] p-5 shadow-[0_24px_70px_rgba(0,0,0,.24)] sm:p-6 lg:max-h-[calc(100vh-110px)] lg:overflow-y-auto">
         <h3 className="text-xl font-bold">
           Comprar boletos
         </h3>
@@ -205,7 +205,7 @@ export default function BuyTicketCard({
         </div>
 
         {/* Ticket types - Scrolleable */}
-        <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scroll">
+        <div className="space-y-3 lg:max-h-[360px] lg:overflow-y-auto lg:pr-2 custom-scroll">
           {ticketTypes.map((type) => {
             const selected =
               eventTickets.find(
@@ -226,7 +226,7 @@ export default function BuyTicketCard({
             return (
               <div
                 key={type.id}
-                className="rounded-2xl border border-white/10 p-4 space-y-3 hover:border-white/20 transition-all"
+                className="rounded-2xl border border-white/10 bg-white/[.03] p-4 space-y-3 transition hover:border-primary/30"
               >
                 <div className="flex justify-between items-center">
                   <div>
@@ -243,6 +243,7 @@ export default function BuyTicketCard({
 
                   {qty === 0 ? (
                     <button
+                      type="button"
                       onClick={() =>
                         handleAdd(type)
                       }
@@ -250,7 +251,7 @@ export default function BuyTicketCard({
                         type.availableQuantity ===
                         0
                       }
-                      className="rounded-full bg-primary/20 px-4 py-2 text-sm font-bold text-primary hover:bg-primary/30 disabled:opacity-30"
+                      className="min-h-11 rounded-xl bg-primary/15 px-4 py-2 text-sm font-bold text-[#ff80e7] transition hover:bg-primary/25 disabled:opacity-40"
                     >
                       {type.availableQuantity ===
                       0
@@ -260,13 +261,15 @@ export default function BuyTicketCard({
                   ) : (
                     <div className="flex items-center gap-2">
                       <button
+                        type="button"
+                        aria-label={`Quitar un boleto ${type.name}`}
                         onClick={() =>
                           handleQuantity(
                             type,
                             -1
                           )
                         }
-                        className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
+                        className="grid size-11 place-items-center rounded-xl bg-white/10 transition-colors hover:bg-white/20"
                       >
                         <Minus size={14} />
                       </button>
@@ -274,6 +277,8 @@ export default function BuyTicketCard({
                         {qty}
                       </span>
                       <button
+                        type="button"
+                        aria-label={`Añadir un boleto ${type.name}`}
                         disabled={
                           qty >= max
                         }
@@ -283,7 +288,7 @@ export default function BuyTicketCard({
                             1
                           )
                         }
-                        className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors disabled:opacity-30"
+                        className="grid size-11 place-items-center rounded-xl bg-white/10 transition-colors hover:bg-white/20 disabled:opacity-30"
                       >
                         <Plus size={14} />
                       </button>
@@ -325,7 +330,7 @@ export default function BuyTicketCard({
             <button
               onClick={handleCheckout}
               disabled={checkoutLoading}
-              className="w-full rounded-full bg-primary px-6 py-4 text-sm font-bold text-white shadow-lg shadow-primary/30 hover:bg-primary/90 transition-all flex justify-center items-center gap-2 disabled:opacity-50"
+              className="flex min-h-13 w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-bold text-[#16051a] shadow-lg shadow-primary/20 transition hover:bg-[#ff78e3] disabled:opacity-50"
             >
               <ShoppingCart size={18} />
               {checkoutLoading
@@ -336,9 +341,10 @@ export default function BuyTicketCard({
         )}
 
         <p className="text-xs text-center text-muted-dark pt-2 border-t border-white/5">
-          Pago seguro con Stripe • Confirmación inmediata
+          El pago se procesa de forma segura con Stripe.
         </p>
       </div>
     </div>
   );
 }
+

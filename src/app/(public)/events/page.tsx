@@ -1,201 +1,68 @@
-// src/app/(public)/events/page.tsx
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import Link from "next/link";
-import { api } from "@/lib/api";
+import { ArrowRight, Search, X } from "lucide-react";
 import { Navbar } from "@/components/navigation/Navbar";
 import { Footer } from "@/components/navigation/Footer";
 import { EventCard } from "@/components/ui/EventCard";
-import { normalizeEvent, type NormalizedEvent } from "@/modules/events/utils/normalizer";
-import { X, Search } from "lucide-react";
+import { CATEGORIES } from "@/lib/categories";
+import { api } from "@/lib/api";
+import { normalizeEvent, type NormalizedEvent, type RawEvent } from "@/modules/events/utils/normalizer";
 
 export const metadata: Metadata = {
-  title: "Explorar Eventos - osmi",
-  description: "Descubre los mejores eventos, conciertos, festivales y más en osmi.",
+  title: "Explorar eventos",
+  description: "Descubre conciertos, deportes, teatro, festivales y más eventos disponibles en OSMI.",
+  alternates: { canonical: "/events" },
 };
 
-// Categorías disponibles
-const CATEGORIES = [
-  { slug: "conciertos", label: "🎵 Conciertos" },
-  { slug: "deportes", label: "⚽ Deportes" },
-  { slug: "teatro", label: "🎭 Teatro" },
-  { slug: "festivales", label: "🎪 Festivales" },
-  { slug: "experiencias", label: "✨ Experiencias" },
-  { slug: "infantiles", label: "🧸 Infantiles" },
-];
-
-interface EventsPageProps {
-  searchParams: Promise<{
-    category?: string;
-    search?: string;
-  }>;
-}
-
-export default async function EventsPage({ searchParams }: EventsPageProps) {
-  const params = await searchParams;
-  const categorySlug = params.category || "";
-  const searchQuery = params.search || "";
-
-  // Validar que la categoría exista
-  const validCategory = CATEGORIES.find(c => c.slug === categorySlug);
-  const isValidCategory = !!validCategory;
-
+async function getEvents(): Promise<NormalizedEvent[] | null> {
   try {
-    const rawEvents = await api.get<any>("/v1/events");
-
-    let eventList: NormalizedEvent[] = Array.isArray(rawEvents)
-      ? rawEvents.map(normalizeEvent)
-      : rawEvents?.events
-      ? rawEvents.events.map(normalizeEvent)
-      : [];
-
-    // ============================================================
-    // FILTRAR POR CATEGORÍA - USANDO category Y tags
-    // ============================================================
-    if (categorySlug && isValidCategory) {
-      eventList = eventList.filter((event) => {
-        // 1. Verificar campo 'category' (opción principal)
-        if (event.category && event.category.toLowerCase() === categorySlug) {
-          return true;
-        }
-        // 2. Verificar 'tags' (opción flexible)
-        if (event.tags && event.tags.length > 0) {
-          return event.tags.some((tag: string) =>
-            tag.toLowerCase().includes(categorySlug)
-          );
-        }
-        return false;
-      });
-    }
-
-    // Filtrar por búsqueda (opcional)
-    if (searchQuery) {
-      eventList = eventList.filter((event) =>
-        event.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        event.description?.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-
-    const isFilterActive = categorySlug || searchQuery;
-    const categoryLabel = validCategory?.label || "Eventos";
-
-    return (
-      <div className="min-h-screen flex flex-col bg-black">
-        <Navbar />
-
-        <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12 w-full">
-          
-          {/* ==================== HEADER ==================== */}
-          <div className="mb-8">
-            <h1 className="text-3xl sm:text-4xl font-black text-foreground">
-              {isFilterActive && categorySlug ? categoryLabel : "Explorar eventos"}
-            </h1>
-            <p className="text-muted mt-1">
-              {eventList.length} {eventList.length === 1 ? "evento" : "eventos"} disponibles
-            </p>
-          </div>
-
-          {/* ==================== CATEGORÍAS ==================== */}
-          <div id="categorias" className="flex flex-wrap gap-2 mb-8 scroll-mt-24">
-            <Link
-              href="/events"
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                !categorySlug && !searchQuery
-                  ? "bg-primary/20 text-primary border border-primary/30"
-                  : "bg-white/5 text-muted border border-white/10 hover:border-primary/30 hover:text-foreground"
-              }`}
-            >
-              Todos
-            </Link>
-            {CATEGORIES.map((cat) => (
-              <Link
-                key={cat.slug}
-                href={`/events?category=${cat.slug}`}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                  categorySlug === cat.slug
-                    ? "bg-primary/20 text-primary border border-primary/30"
-                    : "bg-white/5 text-muted border border-white/10 hover:border-primary/30 hover:text-foreground"
-                }`}
-              >
-                {cat.label}
-              </Link>
-            ))}
-          </div>
-
-          {/* ==================== FILTRO ACTIVO ==================== */}
-          {isFilterActive && (
-            <div className="flex items-center gap-2 mb-6">
-              <span className="text-sm text-muted">Filtro activo:</span>
-              {categorySlug && validCategory && (
-                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm border border-primary/20">
-                  {validCategory.label}
-                  <Link href="/events" className="hover:text-white transition-colors">
-                    <X size={14} />
-                  </Link>
-                </span>
-              )}
-              {searchQuery && (
-                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-secondary/10 text-secondary text-sm border border-secondary/20">
-                  Buscar: "{searchQuery}"
-                  <Link href="/events" className="hover:text-white transition-colors">
-                    <X size={14} />
-                  </Link>
-                </span>
-              )}
-            </div>
-          )}
-
-          {/* ==================== LISTA DE EVENTOS ==================== */}
-          {eventList.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {eventList.map((event) => (
-                <EventCard key={event.public_id} event={event} />
-              ))}
-            </div>
-          ) : (
-            <div className="glass-card p-12 text-center border border-white/5">
-              <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-4">
-                <Search size={32} className="text-muted-dark" />
-              </div>
-              <h3 className="text-xl font-bold text-foreground mb-2">No hay eventos</h3>
-              <p className="text-muted text-sm">
-                {searchQuery
-                  ? `No encontramos resultados para "${searchQuery}"`
-                  : `No hay eventos disponibles en "${categoryLabel}"`}
-              </p>
-              <Link
-                href="/events"
-                className="inline-flex items-center gap-2 mt-4 px-6 py-3 rounded-2xl bg-gradient-to-r from-primary to-secondary text-white font-bold hover:shadow-2xl hover:shadow-primary/30 transition-all"
-              >
-                Ver todos los eventos
-              </Link>
-            </div>
-          )}
-        </main>
-
-        <Footer />
-      </div>
-    );
-  } catch (error) {
-    console.error("Error cargando eventos:", error);
-
-    return (
-      <div className="min-h-screen flex flex-col bg-black">
-        <Navbar />
-
-        <main className="flex-1 max-w-7xl mx-auto px-4 py-12 w-full">
-          <h1 className="text-4xl font-bold mb-4">Explorar eventos</h1>
-          <div className="text-center py-20">
-            <p className="text-lg text-muted">
-              Los eventos no están disponibles temporalmente.
-            </p>
-          </div>
-        </main>
-
-        <Footer />
-      </div>
-    );
+    const response = await api.get<RawEvent[] | { events?: RawEvent[] }>("/v1/events");
+    const raw = Array.isArray(response) ? response : response.events ?? [];
+    return raw.map(normalizeEvent);
+  } catch {
+    return null;
   }
 }
+
+type EventsPageProps = { searchParams: Promise<{ category?: string; search?: string }> };
+
+export default async function EventsPage({ searchParams }: EventsPageProps) {
+  const [params, allEvents] = await Promise.all([searchParams, getEvents()]);
+  const category = CATEGORIES.find((item) => item.slug === params.category);
+  const query = (params.search ?? "").trim();
+  const filtered = allEvents?.filter((event) => {
+    const categoryMatch = !category || event.category.toLowerCase() === category.slug || event.tags.some((tag) => tag.toLowerCase().includes(category.slug));
+    const searchMatch = !query || `${event.name} ${event.description}`.toLocaleLowerCase("es-MX").includes(query.toLocaleLowerCase("es-MX"));
+    return categoryMatch && searchMatch;
+  }) ?? [];
+
+  return (
+    <div className="flex min-h-screen flex-col bg-background">
+      <Navbar />
+      <main className="section-inner flex-1 px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+        <div className="mb-9 rounded-[28px] border border-white/10 bg-[radial-gradient(circle_at_85%_20%,rgba(255,43,214,.16),transparent_38%),linear-gradient(120deg,#1a102e,#0c0a1a)] p-7 sm:p-10">
+          <p className="mb-3 text-xs font-bold uppercase tracking-[.2em] text-primary">La cartelera</p>
+          <h1 className="text-3xl font-bold tracking-tight text-white sm:text-5xl">{category ? category.label : "Explorar eventos"}</h1>
+          <p className="mt-3 text-sm text-muted">{allEvents === null ? "Los eventos no están disponibles temporalmente." : `${filtered.length} ${filtered.length === 1 ? "evento disponible" : "eventos disponibles"}`}</p>
+        </div>
+        <nav id="categorias" aria-label="Filtrar eventos por categoría" className="mb-8 flex gap-2 overflow-x-auto pb-2 scroll-mt-24 sm:flex-wrap sm:overflow-visible">
+          <Link href="/events" aria-current={!category && !query ? "page" : undefined} className={`inline-flex min-h-11 shrink-0 items-center rounded-full border px-4 text-sm font-semibold transition ${!category && !query ? "border-primary/45 bg-primary/15 text-[#ff80e7]" : "border-white/10 bg-white/[.04] text-muted hover:border-primary/35 hover:text-white"}`}>Todos</Link>
+          {CATEGORIES.map((item) => <Link key={item.slug} href={`/events?category=${item.slug}`} aria-current={category?.slug === item.slug ? "page" : undefined} className={`inline-flex min-h-11 shrink-0 items-center rounded-full border px-4 text-sm font-semibold transition ${category?.slug === item.slug ? "border-primary/45 bg-primary/15 text-[#ff80e7]" : "border-white/10 bg-white/[.04] text-muted hover:border-primary/35 hover:text-white"}`}>{item.label}</Link>)}
+        </nav>
+        {query && <div className="mb-6 flex flex-wrap items-center gap-2 text-sm text-muted">Resultados para <span className="text-white">“{query}”</span><Link href="/events" aria-label="Quitar búsqueda" className="inline-flex min-h-10 items-center gap-1 rounded-full border border-white/10 px-3 text-xs font-semibold text-primary hover:border-primary/40"><X size={14} /> Quitar filtro</Link></div>}
+        {allEvents === null ? (
+          <div className="rounded-3xl border border-white/10 bg-[#111024] px-6 py-12 text-center"><h2 className="text-xl font-bold text-white">No pudimos cargar la cartelera</h2><p className="mt-3 text-sm text-muted">Inténtalo de nuevo en unos momentos.</p></div>
+        ) : filtered.length ? (
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">{filtered.map((event) => <EventCard key={event.public_id} event={event} />)}</div>
+        ) : (
+          <div className="rounded-3xl border border-white/10 bg-[#111024] px-6 py-12 text-center"><Search size={30} className="mx-auto text-primary" /><h2 className="mt-4 text-xl font-bold text-white">No encontramos eventos</h2><p className="mt-2 text-sm text-muted">Prueba con otra categoría o búsqueda.</p><Link href="/events" className="mt-6 inline-flex min-h-12 items-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-bold text-[#16051a] transition hover:bg-[#ff78e3]">Ver todos los eventos <ArrowRight size={17} /></Link></div>
+        )}
+      </main>
+      <Footer />
+    </div>
+  );
+}
+

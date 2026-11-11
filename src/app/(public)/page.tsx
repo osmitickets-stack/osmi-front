@@ -1,257 +1,122 @@
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
+import type { Metadata } from "next";
+import Link from "next/link";
+import { ArrowRight, Music2, Trophy, Drama, PartyPopper, Sparkles, Shapes } from "lucide-react";
 import { Navbar } from "@/components/navigation/Navbar";
 import { HeroSection } from "@/components/home/HeroSection";
 import { EventCard } from "@/components/ui/EventCard";
 import { Footer } from "@/components/navigation/Footer";
-import { Music, Trophy, Theater, PartyPopper, Sparkles, Star, ArrowRight } from "lucide-react";
-import Link from "next/link";
 import { api } from "@/lib/api";
-import { normalizeEvent, type NormalizedEvent } from "@/modules/events/utils/normalizer";
+import { normalizeEvent, type NormalizedEvent, type RawEvent } from "@/modules/events/utils/normalizer";
 
-// ============================================================
-// METADATA
-// ============================================================
-export const metadata = {
-  title: "MyOsmi | Boletos para conciertos, deportes y eventos | Compra segura",
-  description: "Compra boletos para conciertos, deportes, teatro y festivales. osmi es la plataforma de ticketing más inteligente con entrega inmediata y soporte 24/7.",
-  keywords: "boletos, conciertos, deportes, teatro, festivales, ticketing, eventos, osmi, compra de boletos, experiencias",
+export const metadata: Metadata = {
+  title: "Eventos y boletos",
+  description: "Descubre conciertos, deportes, teatro y experiencias. Explora los eventos disponibles y consulta tus boletos en OSMI.",
+  alternates: { canonical: "/" },
   openGraph: {
-    title: "MyOsmi | Boletos para conciertos, deportes y eventos",
-    description: "Compra boletos seguros para los mejores eventos. Entrega inmediata y soporte 24/7.",
+    title: "OSMI | Eventos y boletos",
+    description: "Encuentra tu próxima experiencia en OSMI.",
     type: "website",
     locale: "es_MX",
-    siteName: "MyOsmi",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "MyOsmi - Boletos para eventos",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "MyOsmi | Boletos para eventos",
-    description: "Compra boletos seguros para los mejores eventos.",
-    images: ["/og-image.png"],
+    siteName: "OSMI",
   },
 };
 
-// ============================================================
-// DATOS
-// ============================================================
+const categories = [
+  { label: "Conciertos", slug: "conciertos", icon: Music2 },
+  { label: "Deportes", slug: "deportes", icon: Trophy },
+  { label: "Teatro", slug: "teatro", icon: Drama },
+  { label: "Festivales", slug: "festivales", icon: PartyPopper },
+  { label: "Experiencias", slug: "experiencias", icon: Sparkles },
+  { label: "Infantiles", slug: "infantiles", icon: Shapes },
+];
 
 async function getEvents(): Promise<NormalizedEvent[]> {
   try {
-    const data = await api.get<any>("/v1/events");
-    const rawEvents = Array.isArray(data) ? data : data?.events || [];
-    return rawEvents.map(normalizeEvent);
-  } catch { return []; }
+    const data = await api.get<{ events?: RawEvent[] } | RawEvent[]>("/v1/events");
+    const raw = Array.isArray(data) ? data : data.events ?? [];
+    return raw.map(normalizeEvent);
+  } catch {
+    return [];
+  }
 }
-
-// ============================================================
-// CATEGORÍAS - CORREGIDAS (apuntan a /events con filtros)
-// ============================================================
-const categories = [
-  { icon: Music, label: "Conciertos", color: "text-primary", href: "/events?category=conciertos" },
-  { icon: Trophy, label: "Deportes", color: "text-accent", href: "/events?category=deportes" },
-  { icon: Theater, label: "Teatro", color: "text-secondary", href: "/events?category=teatro" },
-  { icon: PartyPopper, label: "Festivales", color: "text-warning", href: "/events?category=festivales" },
-  { icon: Sparkles, label: "Experiencias", color: "text-primary", href: "/events?category=experiencias" },
-  { icon: Star, label: "Infantiles", color: "text-success", href: "/events?category=infantiles" },
-];
-
-// ============================================================
-// COMPONENTE PRINCIPAL
-// ============================================================
 
 export default async function HomePage() {
   const events = await getEvents();
-
-// Schema.org markup para eventos (JSON-LD)
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  name: "MyOsmi",  // ← CAMBIADO a MyOsmi
-  description: "Plataforma de ticketing para conciertos, deportes, teatro y festivales.",
-  url: "https://myosmi.com",
-  potentialAction: {
-    "@type": "SearchAction",
-    target: "https://myosmi.com/events?search={search_term_string}",
-    "query-input": "required name=search_term_string",
-  },
-};
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "OSMI",
+    url: "https://myosmi.com",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: "https://myosmi.com/events?search={search_term_string}",
+      "query-input": "required name=search_term_string",
+    },
+  };
 
   return (
-    <>
-      {/* JSON-LD para SEO */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-      
-      <div className="flex flex-col min-h-screen bg-black">
-        <Navbar />
-        <HeroSection />
+    <div className="flex min-h-screen flex-col bg-background">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <Navbar />
+      <HeroSection events={events} />
 
-        {/* ============================================================
-            CATEGORÍAS
-        ============================================================ */}
-        <section className="section-full bg-transparent py-16">
-          <div className="section-inner">
-            <div className="text-center mb-12">
-              <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold tracking-widest border border-primary/20 mb-4">
-                DESCUBRE
-              </span>
-              <h2 className="text-3xl md:text-5xl font-black title-gradient">
-                ¿Qué quieres vivir hoy?
-              </h2>
-              <p className="text-muted mt-3 text-sm max-w-md mx-auto">
-                Explora miles de eventos y encuentra tu próxima experiencia inolvidable
-              </p>
-            </div>
-
-            <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
-              {categories.map(({ icon: Icon, label, color, href }) => (
-                <Link
-                  key={label}
-                  href={href}
-                  className="glass-card p-6 flex flex-col items-center gap-3 text-center hover:glow-primary transition-all duration-300 group border-neon"
-                >
-                  <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                    <Icon size={26} className={`${color} group-hover:scale-110 transition-transform`} />
-                  </div>
-                  <span className="text-xs font-semibold text-foreground/80 group-hover:text-foreground transition-colors">
-                    {label}
-                  </span>
-                  <div className="w-0 h-0.5 bg-gradient-to-r from-primary to-secondary group-hover:w-full transition-all duration-500"></div>
-                </Link>
-              ))}
-            </div>
+      <section aria-labelledby="categories-title" className="section-inner px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+        <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+          <div>
+            <p className="mb-3 text-xs font-bold uppercase tracking-[.22em] text-primary">Descubre</p>
+            <h2 id="categories-title" className="text-3xl font-bold tracking-tight text-white sm:text-4xl">¿Qué quieres vivir?</h2>
+            <p className="mt-3 max-w-xl text-sm leading-6 text-muted sm:text-base">Encuentra el plan que va contigo.</p>
           </div>
-        </section>
+          <Link href="/events" className="inline-flex min-h-11 items-center gap-2 self-start text-sm font-semibold text-white underline decoration-primary/60 underline-offset-8 hover:text-primary sm:self-auto">Todos los eventos <ArrowRight size={16} /></Link>
+        </div>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+          {categories.map(({ icon: Icon, label, slug }) => (
+            <Link key={slug} href={`/events?category=${slug}`} className="group flex min-h-32 flex-col justify-between rounded-2xl border border-white/10 bg-[#111024] p-5 transition hover:-translate-y-1 hover:border-primary/45 hover:bg-[#1b102e] focus-visible:outline-2 focus-visible:outline-primary">
+              <span className="grid size-10 place-items-center rounded-xl bg-primary/10 text-primary"><Icon size={21} aria-hidden="true" /></span>
+              <span className="flex items-center justify-between gap-2 text-sm font-semibold text-white">{label}<ArrowRight size={15} className="text-muted transition group-hover:translate-x-1 group-hover:text-primary" /></span>
+            </Link>
+          ))}
+        </div>
+      </section>
 
-        {/* ============================================================
-            EVENTOS DESTACADOS
-        ============================================================ */}
-        {events.length > 0 && (
-          <section className="section-full bg-transparent py-16 border-t border-white/5">
-            <div className="section-inner">
-              <div className="flex flex-col md:flex-row items-center justify-between mb-10">
-                <div>
-                  <span className="inline-block px-4 py-1.5 rounded-full bg-secondary/10 text-secondary text-xs font-bold tracking-widest border border-secondary/20 mb-3">
-                    EVENTOS
-                  </span>
-                  <h2 className="text-3xl md:text-4xl font-black text-foreground">
-                    Próximos <span className="text-gradient">eventos</span>
-                  </h2>
-                </div>
-                <Link
-                  href="/events"
-                  className="group inline-flex items-center gap-2 text-sm font-semibold text-muted hover:text-primary transition-colors mt-4 md:mt-0"
-                >
-                  Ver todos
-                  <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                </Link>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-                {events.slice(0, 4).map((event) => (
-                  <div key={event.public_id} className="animate-fade-in-up" style={{ animationDelay: `${Math.random() * 0.3}s` }}>
-                    <EventCard event={event} />
-                  </div>
-                ))}
-              </div>
+      <section aria-labelledby="events-title" className="border-t border-white/5 bg-[#0a0717]">
+        <div className="section-inner px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+          <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+            <div>
+              <p className="mb-3 text-xs font-bold uppercase tracking-[.22em] text-primary">En cartelera</p>
+              <h2 id="events-title" className="text-3xl font-bold tracking-tight text-white sm:text-4xl">Próximas experiencias</h2>
+              <p className="mt-3 text-sm text-muted">Eventos disponibles ahora en OSMI.</p>
             </div>
-          </section>
-        )}
-
-        {/* ============================================================
-            CONFIANZA - SOLO DATOS REALES
-        ============================================================ */}
-        <section className="section-full bg-transparent py-16 border-t border-white/5">
-          <div className="section-inner text-center">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <div className="w-1 h-1 rounded-full bg-primary animate-pulse"></div>
-              <span className="text-xs text-muted-dark uppercase tracking-[0.3em] font-semibold">
-                Confían en nosotros
-              </span>
-              <div className="w-1 h-1 rounded-full bg-primary animate-pulse"></div>
-            </div>
-
-            <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16">
-              {/* SOLO LOS QUE EXISTEN EN TU SEED */}
-              {["Alas Wings", "Desfragmentado", "El País"].map((brand) => (
-                <span
-                  key={brand}
-                  className="text-lg md:text-2xl font-bold text-muted-dark/50 hover:text-muted hover:scale-105 transition-all duration-300 cursor-default"
-                >
-                  {brand}
-                </span>
-              ))}
-            </div>
-
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-12">
-              <div className="glass-card p-6 text-center">
-                <div className="text-3xl md:text-4xl font-black text-gradient">25+</div>
-                <p className="text-xs text-muted mt-1">Eventos realizados</p>
-              </div>
-              <div className="glass-card p-6 text-center">
-                <div className="text-3xl md:text-4xl font-black text-gradient">4.9★</div>
-                <p className="text-xs text-muted mt-1">Calificación promedio</p>
-              </div>
-              <div className="glass-card p-6 text-center">
-                <div className="text-3xl md:text-4xl font-black text-gradient">100%</div>
-                <p className="text-xs text-muted mt-1">Seguridad garantizada</p>
-              </div>
-              <div className="glass-card p-6 text-center">
-                <div className="text-3xl md:text-4xl font-black text-gradient">24/7</div>
-                <p className="text-xs text-muted mt-1">Soporte disponible</p>
-              </div>
-            </div>
+            <Link href="/events" className="inline-flex min-h-11 items-center gap-2 self-start text-sm font-semibold text-white underline decoration-primary/60 underline-offset-8 hover:text-primary sm:self-auto">Ver cartelera completa <ArrowRight size={16} /></Link>
           </div>
-        </section>
-
-        {/* ============================================================
-            CALL TO ACTION
-        ============================================================ */}
-        <section className="section-full bg-transparent py-16 border-t border-white/5">
-          <div className="section-inner">
-            <div className="glass-card p-12 md:p-16 text-center relative overflow-hidden border-neon">
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-secondary/5 to-accent/5"></div>
-              <div className="relative z-10">
-                <div className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold tracking-widest border border-primary/20 mb-6">
-                  COMUNIDAD
-                </div>
-                <h2 className="text-3xl md:text-5xl font-black title-gradient mb-4">
-                  Únete a la comunidad
-                </h2>
-                <p className="text-muted max-w-lg mx-auto mb-8">
-                  Sé parte de los primeros en enterarte de nuevos eventos y experiencias exclusivas.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <input
-                    type="email"
-                    placeholder="Tu correo electrónico"
-                    className="px-6 py-3 rounded-full bg-white/5 border border-white/10 text-foreground placeholder-muted-dark focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all min-w-[280px]"
-                  />
-                  <button className="btn-primary px-8 py-3">
-                    Suscribirme
-                  </button>
-                </div>
-                <p className="text-xs text-muted-dark mt-4">
-                  No enviamos spam. Puedes cancelar cuando quieras.
-                </p>
-              </div>
+          {events.length ? (
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
+              {events.slice(0, 4).map((event) => <EventCard key={event.public_id} event={event} />)}
             </div>
-          </div>
-        </section>
+          ) : (
+            <div className="rounded-3xl border border-white/10 bg-white/[.03] px-6 py-12 text-center">
+              <h3 className="text-xl font-bold text-white">La cartelera está en camino</h3>
+              <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted">Vuelve pronto para descubrir los próximos eventos.</p>
+            </div>
+          )}
+        </div>
+      </section>
 
-        <Footer />
-      </div>
-    </>
+      <section className="section-inner px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+        <div className="relative overflow-hidden rounded-[28px] border border-primary/20 bg-[radial-gradient(circle_at_85%_20%,rgba(255,43,214,.18),transparent_36%),linear-gradient(120deg,#1b0c30,#0c0b20)] px-7 py-12 sm:px-12 sm:py-16">
+          <div className="relative max-w-2xl">
+            <p className="mb-4 text-xs font-bold uppercase tracking-[.22em] text-[#ff80e7]">Hazlo posible</p>
+            <h2 className="text-3xl font-bold leading-tight tracking-tight text-white sm:text-5xl">Tu próximo evento empieza aquí.</h2>
+            <p className="mt-5 max-w-lg text-sm leading-7 text-white/70 sm:text-base">Si organizas experiencias, conoce las herramientas de OSMI para darles vida.</p>
+            <Link href="/para-organizadores" className="mt-8 inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-bold text-[#16051a] transition hover:bg-[#ff78e3] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">Conocer OSMI para organizadores <ArrowRight size={17} /></Link>
+          </div>
+        </div>
+      </section>
+      <Footer />
+    </div>
   );
 }
+

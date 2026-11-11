@@ -1,352 +1,73 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect, useCallback } from "react";
-import {
-  ArrowRight,
-  Calendar,
-  MapPin,
-  ChevronLeft,
-  ChevronRight,
-  Clock,
-} from "lucide-react";
+import { ArrowRight, CalendarDays, ChevronLeft, ChevronRight, MapPin } from "lucide-react";
+import type { NormalizedEvent } from "@/modules/events/utils/normalizer";
 
-import { api } from "@/lib/api";
-import {
-  normalizeEvent,
-  type NormalizedEvent,
-} from "@/modules/events/utils/normalizer";
+type HeroSectionProps = { events: NormalizedEvent[] };
 
-const CLOUDINARY_BASE = "https://res.cloudinary.com/dkasxv8fj/image/upload";
-
-const AD_SLIDES = [
-  {
-    id: "beneficios",
-    title: "Beneficios osmi",
-    description:
-      "Regístrate y obtén acceso a preventas exclusivas, descuentos especiales, experiencias VIP y soporte prioritario.",
-    link: "/register",
-    linkText: "Registrarme ahora",
-    color: "from-secondary/40 via-primary/20",
-    badge: "EXCLUSIVO",
-    image: `${CLOUDINARY_BASE}/v1786533285/ChatGPT_Image_Aug_12_2026_05_13_53_AM_powlhq.png`,
-  },
-  {
-    id: "organizadores",
-    title: "Para Organizadores",
-    description:
-      "Publica tus eventos con nosotros. Dashboard en tiempo real, pagos seguros y mayor alcance.",
-    link: "/organizadores",
-    linkText: "Saber más",
-    color: "from-primary/40 via-secondary/20",
-    badge: "ORGANIZADORES",
-    image: `${CLOUDINARY_BASE}/v1786533285/ChatGPT_Image_Aug_12_2026_05_08_02_AM_w0cilx.png`,
-  },
-  {
-    id: "tienda",
-    title: "Tienda Física osmi",
-    description:
-      "Recoge premios, merchandise exclusivo y conoce nuestra tienda oficial.",
-    link: "/tienda",
-    linkText: "Cómo llegar",
-    color: "from-orange-500/30 via-primary/20",
-    badge: "TIENDA",
-    image: `${CLOUDINARY_BASE}/v1786533285/ChatGPT_Image_Aug_12_2026_05_11_34_AM_wboxeg.png`,
-  },
-];
-
-export const HeroSection = () => {
-  const [events, setEvents] = useState<NormalizedEvent[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchEvents() {
-      try {
-        const data = await api.get<any>("/v1/events");
-        const rawEvents = Array.isArray(data) ? data : data?.events || [];
-        const normalized = rawEvents.map(normalizeEvent);
-        setEvents(normalized);
-      } catch (err) {
-        console.error("Error cargando eventos:", err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchEvents();
-  }, []);
-
-  const featuredEvent = events.find((e) => e.image_url) || events[0] || null;
-
-  const allSlides = [
-    ...AD_SLIDES.map((ad) => ({ type: "ad" as const, ...ad })),
-    ...events.map((event) => ({ type: "event" as const, event })),
-  ];
-
-  useEffect(() => {
-    if (allSlides.length <= 1) return;
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % allSlides.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [allSlides.length]);
-
-  const goTo = useCallback((index: number) => setCurrentIndex(index), []);
-  const goNext = useCallback(() => {
-    setCurrentIndex((prev) => (prev + 1) % allSlides.length);
-  }, [allSlides.length]);
-  const goPrev = useCallback(() => {
-    setCurrentIndex((prev) => (prev - 1 + allSlides.length) % allSlides.length);
-  }, [allSlides.length]);
-
-  if (loading) {
-    return (
-      <section className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 pb-4">
-        <div className="rounded-[40px] border border-white/[0.06] min-h-[400px] sm:min-h-[520px] lg:min-h-[600px] bg-white/[0.02] animate-pulse" />
-      </section>
-    );
-  }
-
-  if (allSlides.length === 0) return null;
-
-  const slide = allSlides[currentIndex];
-
-  const formattedDate = featuredEvent
-    ? new Date(featuredEvent.start_date).toLocaleDateString("es-MX", {
-        weekday: "long",
-        day: "numeric",
-        month: "long",
-      })
-    : "";
+export function HeroSection({ events }: HeroSectionProps) {
+  const [index, setIndex] = useState(0);
+  const featured = events.filter((event) => event.image_url).slice(0, 4);
+  const current = featured[index] ?? featured[0];
 
   return (
-    <section className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 pb-4">
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6 sm:gap-8">
-
-        {/* ==================== CARRUSEL ==================== */}
-        <div className="relative overflow-hidden rounded-[30px] sm:rounded-[40px] border border-white/[0.06] min-h-[400px] sm:min-h-[520px] lg:min-h-[600px] flex items-end group">
-          
-          <div className="absolute inset-0 transition-opacity duration-700">
-            {slide.type === "event" && slide.event?.image_url ? (
-              <Image
-                src={slide.event.image_url}
-                alt={slide.event.name}
-                fill
-                priority
-                className="object-cover transition-transform duration-700 group-hover:scale-105"
-                sizes="(max-width: 768px) 100vw, 50vw"
-              />
-            ) : slide.type === "ad" && slide.image ? (
-              <Image
-                src={slide.image}
-                alt={slide.title}
-                fill
-                priority
-                className="object-cover transition-transform duration-700 group-hover:scale-105"
-                sizes="(max-width: 768px) 100vw, 50vw"
-              />
-            ) : (
-              <div className={`absolute inset-0 bg-gradient-to-br ${slide.type === "ad" ? slide.color : "from-secondary/40 via-primary/20"} to-background`} />
-            )}
-          </div>
-
-          {/* Gradientes */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
-
-          {/* Indicadores */}
-          {allSlides.length > 1 && (
-            <div className="absolute top-4 sm:top-6 left-1/2 -translate-x-1/2 z-20 flex gap-1.5 sm:gap-2">
-              {allSlides.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => goTo(i)}
-                  className={`transition-all duration-300 ${
-                    i === currentIndex
-                      ? "w-6 sm:w-8 h-1.5 bg-primary rounded-full shadow-lg shadow-primary/40"
-                      : "w-1.5 h-1.5 rounded-full bg-white/40 hover:bg-white/60"
-                  }`}
-                  aria-label={`Ir al slide ${i + 1}`}
-                />
-              ))}
-            </div>
+    <section aria-label="Eventos destacados" className="section-inner px-4 pt-6 sm:px-6 sm:pt-9 lg:px-8">
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1.8fr)_minmax(290px,.7fr)] lg:gap-5">
+        <div className="relative isolate flex min-h-[520px] overflow-hidden rounded-[28px] border border-white/10 bg-[#140b28] sm:min-h-[570px] sm:rounded-[36px] lg:min-h-[610px]">
+          {current?.image_url ? (
+            <Image src={current.image_url} alt="" fill priority className="object-cover" sizes="(max-width: 1024px) 100vw, 68vw" />
+          ) : (
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_25%,#55227d_0%,transparent_42%),radial-gradient(circle_at_80%_80%,#3b1a68_0%,transparent_38%),linear-gradient(135deg,#110922,#090615)]" />
           )}
-
-          {/* Flechas */}
-          {allSlides.length > 1 && (
-            <>
-              <button
-                onClick={goPrev}
-                className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-14 sm:h-14 rounded-full bg-black/70 backdrop-blur-xl border border-white/15 flex items-center justify-center text-white hover:bg-black/90 hover:border-primary/40 transition-all duration-300 hover:scale-105 active:scale-95"
-                aria-label="Anterior"
-              >
-                <ChevronLeft size={20} className="sm:size-6" />
-              </button>
-              <button
-                onClick={goNext}
-                className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-14 sm:h-14 rounded-full bg-black/70 backdrop-blur-xl border border-white/15 flex items-center justify-center text-white hover:bg-black/90 hover:border-primary/40 transition-all duration-300 hover:scale-105 active:scale-95"
-                aria-label="Siguiente"
-              >
-                <ChevronRight size={20} className="sm:size-6" />
-              </button>
-            </>
-          )}
-
-          {/* Contenido */}
-          <div className="relative z-10 p-6 sm:p-8 lg:p-10 xl:p-14 w-full max-w-2xl">
-            <span className="inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-primary/20 backdrop-blur-sm border border-primary/30 text-primary text-[10px] sm:text-xs font-bold uppercase tracking-[0.15em] mb-3 sm:mb-4">
-              {slide.type === "ad" ? slide.badge : slide.event?.min_price > 0 ? "Boletos disponibles" : "Próximamente"}
+          <div className="absolute inset-0 bg-gradient-to-r from-[#080510]/95 via-[#080510]/75 to-[#080510]/15" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#080510]/85 via-transparent to-transparent" />
+          <div className="relative z-10 flex w-full flex-col justify-end p-6 sm:p-10 lg:p-12">
+            <span className="mb-5 w-fit rounded-full border border-primary/35 bg-primary/15 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[.18em] text-[#ff80e7]">
+              {current ? "En cartelera" : "Descubre OSMI"}
             </span>
-
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-black leading-[0.95] tracking-tight mb-3 sm:mb-4 text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
-              {slide.type === "ad" ? slide.title : slide.event?.name}
+            <h1 className="max-w-[740px] text-[clamp(2.45rem,5.6vw,5.3rem)] font-black leading-[1.02] tracking-[-.055em] text-white">
+              {current ? current.name : <>Momentos que <span className="text-[#ff66de]">se quedan.</span></>}
             </h1>
-
-            <div className="bg-black/50 backdrop-blur-md p-3 sm:p-4 rounded-xl border border-white/10 mb-3 sm:mb-4">
-              <p className="text-sm sm:text-base text-gray-200 max-w-xl leading-relaxed drop-shadow-sm">
-                {slide.type === "ad" 
-                  ? slide.description 
-                  : slide.event?.description?.length > 120 
-                    ? slide.event?.description?.slice(0, 120) + "..." 
-                    : slide.event?.description
-                }
-              </p>
-            </div>
-
-            {slide.type === "event" && (
-              <div className="bg-black/50 backdrop-blur-md p-3 sm:p-4 rounded-xl border border-white/10 mb-4 sm:mb-6">
-                <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-xs sm:text-sm text-gray-300">
-                  <div className="flex items-center gap-2">
-                    <Calendar size={14} className="sm:size-4 text-secondary" />
-                    <span className="drop-shadow-sm">
-                      {new Date(slide.event.start_date).toLocaleDateString("es-MX", { 
-                        weekday: "long", 
-                        day: "numeric", 
-                        month: "long",
-                        year: "numeric"
-                      })}
-                    </span>
-                  </div>
-                  {slide.event.location && (
-                    <div className="flex items-center gap-2">
-                      <MapPin size={14} className="sm:size-4 text-secondary" />
-                      <span className="drop-shadow-sm">{slide.event.location}</span>
-                    </div>
-                  )}
-                </div>
+            <p className="mt-5 max-w-[580px] text-sm leading-7 text-white/80 sm:text-base">
+              {current?.description ? `${current.description.slice(0, 145)}${current.description.length > 145 ? "…" : ""}` : "Encuentra tu próximo evento y vive la experiencia desde el primer clic."}
+            </p>
+            {current && (
+              <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-xs font-medium text-white/80 sm:text-sm">
+                <span className="inline-flex items-center gap-2"><CalendarDays size={16} className="text-[#ff80e7]" />{new Date(current.start_date).toLocaleDateString("es-MX", { day: "numeric", month: "long", year: "numeric" })}</span>
+                {current.location && <span className="inline-flex items-center gap-2"><MapPin size={16} className="text-[#ff80e7]" />{current.location}</span>}
               </div>
             )}
-
-            <div className="flex flex-wrap gap-3 sm:gap-4">
-              <Link
-                href={slide.type === "ad" ? slide.link : `/events/${slide.event?.public_id}`}
-                className="inline-flex items-center gap-2 px-7 sm:px-9 py-4 sm:py-4.5 rounded-full bg-gradient-to-r from-primary to-primary/80 text-sm sm:text-base font-bold text-white hover:from-primary/90 hover:to-primary/70 transition-all shadow-xl shadow-primary/30 hover:shadow-primary/50 hover:scale-105 active:scale-95 min-h-[52px] sm:min-h-[56px]"
-              >
-                {slide.type === "ad" ? slide.linkText : "Comprar boletos"}
-                <ArrowRight size={18} className="sm:size-5" />
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <Link href={current ? `/events/${current.public_id}` : "/events"} className="inline-flex min-h-12 items-center justify-center gap-3 rounded-xl bg-primary px-6 py-3 text-sm font-bold text-[#16051a] shadow-[0_10px_30px_rgba(255,43,214,.25)] transition hover:bg-[#ff78e3] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+                {current ? "Ver evento y boletos" : "Explorar eventos"}<ArrowRight size={17} />
               </Link>
-              <Link
-                href="/events"
-                className="inline-flex items-center gap-2 px-7 sm:px-9 py-4 sm:py-4.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/15 text-sm sm:text-base font-semibold text-white hover:bg-white/20 hover:border-primary/30 transition-all hover:scale-105 active:scale-95 min-h-[52px] sm:min-h-[56px]"
-              >
-                Más ...
-              </Link>
+              {current && <Link href="/events" className="inline-flex min-h-12 items-center justify-center rounded-xl border border-white/25 bg-white/10 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">Explorar más eventos</Link>}
             </div>
+          </div>
+          {featured.length > 1 && (
+            <div className="absolute right-5 top-5 z-20 flex gap-2 sm:right-8 sm:top-8">
+              <button type="button" onClick={() => setIndex((index + featured.length - 1) % featured.length)} aria-label="Evento anterior" className="grid size-11 place-items-center rounded-full border border-white/25 bg-black/40 text-white backdrop-blur transition hover:bg-black/65 focus-visible:outline-2 focus-visible:outline-primary"><ChevronLeft size={20} /></button>
+              <button type="button" onClick={() => setIndex((index + 1) % featured.length)} aria-label="Evento siguiente" className="grid size-11 place-items-center rounded-full border border-white/25 bg-black/40 text-white backdrop-blur transition hover:bg-black/65 focus-visible:outline-2 focus-visible:outline-primary"><ChevronRight size={20} /></button>
+            </div>
+          )}
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
+          <div className="flex min-h-[230px] flex-col justify-between rounded-[28px] border border-primary/20 bg-[radial-gradient(circle_at_90%_10%,rgba(255,43,214,.18),transparent_45%),linear-gradient(145deg,#1b0c2e,#100a22)] p-6 sm:p-7">
+            <span className="text-[11px] font-bold uppercase tracking-[.2em] text-[#ff80e7]">Para organizadores</span>
+            <div><h2 className="max-w-xs text-2xl font-bold leading-tight tracking-tight text-white sm:text-3xl">Tu evento merece un gran escenario.</h2><p className="mt-3 text-sm leading-6 text-white/65">Conoce cómo publicar y gestionar tus eventos en OSMI.</p></div>
+            <Link href="/para-organizadores" className="inline-flex min-h-11 w-fit items-center gap-2 text-sm font-bold text-white underline decoration-primary/60 underline-offset-8 transition hover:text-[#ff80e7]">Conoce OSMI para organizadores <ArrowRight size={16} /></Link>
+          </div>
+          <div className="flex min-h-[230px] flex-col justify-between rounded-[28px] border border-white/10 bg-[#111026] p-6 sm:p-7">
+            <span className="text-[11px] font-bold uppercase tracking-[.2em] text-accent">Tu experiencia</span>
+            <div><h2 className="text-2xl font-bold leading-tight tracking-tight text-white sm:text-3xl">Del evento a tus boletos, en un solo lugar.</h2><p className="mt-3 text-sm leading-6 text-white/65">Consulta tus compras desde tu cuenta y encuentra ayuda cuando la necesites.</p></div>
+            <Link href="/dashboard" className="inline-flex min-h-11 w-fit items-center gap-2 text-sm font-bold text-white underline decoration-accent/60 underline-offset-8 transition hover:text-accent">Ir a mis boletos <ArrowRight size={16} /></Link>
           </div>
         </div>
-
-        {/* ==================== PANEL DERECHO ==================== */}
-        {featuredEvent && (
-          <div className="flex flex-col gap-4 sm:gap-6">
-            <div className="glass-card overflow-hidden relative flex-1 min-h-[200px] sm:min-h-[280px] border border-white/10 hover:border-primary/20 transition-all duration-300">
-              {featuredEvent.image_url && (
-                <div className="absolute inset-0">
-                  <Image
-                    src={featuredEvent.image_url}
-                    alt={featuredEvent.name}
-                    fill
-                    className="object-cover opacity-25"
-                    sizes="(max-width: 768px) 100vw, 33vw"
-                  />
-                </div>
-              )}
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.06] to-secondary/[0.04]" />
-              <div className="relative z-10 p-5 sm:p-7 h-full flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="badge badge-hot text-[10px] sm:text-xs">DESTACADO</span>
-                    {featuredEvent.min_price > 0 && (
-                      <span className="text-[10px] sm:text-xs text-primary font-bold">
-                        ${featuredEvent.min_price.toLocaleString("es-MX")}
-                      </span>
-                    )}
-                  </div>
-                  <h3 className="text-base sm:text-lg font-black text-white line-clamp-2 drop-shadow-md">
-                    {featuredEvent.name}
-                  </h3>
-                  <div className="mt-2 space-y-1.5 text-xs sm:text-sm text-gray-300">
-                    <div className="flex items-center gap-2">
-                      <Calendar size={12} className="sm:size-3.5 text-secondary flex-shrink-0" />
-                      <span className="line-clamp-1 drop-shadow-sm">{formattedDate}</span>
-                    </div>
-                    {featuredEvent.location && (
-                      <div className="flex items-center gap-2">
-                        <MapPin size={12} className="sm:size-3.5 text-secondary flex-shrink-0" />
-                        <span className="line-clamp-1 drop-shadow-sm">{featuredEvent.location}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-                
-                <div className="mt-4 sm:mt-5">
-                  <Link
-                    href={`/events/${featuredEvent.public_id}`}
-                    className="flex items-center justify-center gap-2 w-full px-4 py-3 sm:py-3.5 rounded-full bg-gradient-to-r from-primary to-primary/80 text-sm font-bold text-white hover:from-primary/90 hover:to-primary/70 transition-all shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:scale-[1.02] active:scale-95 min-h-[44px] sm:min-h-[48px]"
-                  >
-                    Ver evento
-                    <ArrowRight size={16} />
-                  </Link>
-                </div>
-              </div>
-            </div>
-
-            <div className="glass-card p-5 sm:p-7 relative overflow-hidden border border-white/10">
-              <div className="absolute inset-0 bg-gradient-to-br from-secondary/[0.04] to-primary/[0.02]" />
-              <div className="relative z-10">
-                <h3 className="text-base sm:text-lg font-black text-white">Noticias osmi</h3>
-                <div className="mt-3 sm:mt-4 space-y-2 sm:space-y-3">
-                  {events.slice(0, 3).map((e, i) => (
-                    <Link
-                      key={e.public_id}
-                      href={`/events/${e.public_id}`}
-                      className="flex items-center gap-3 p-2 rounded-xl hover:bg-white/[0.04] transition-all group"
-                    >
-                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-white/[0.04] flex items-center justify-center text-xs font-bold text-primary shrink-0 group-hover:bg-primary/10 transition-colors">
-                        {i + 1}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-xs sm:text-sm font-semibold truncate group-hover:text-primary transition-colors text-white">
-                          {e.name}
-                        </p>
-                        <p className="text-[10px] sm:text-xs text-muted-dark truncate">
-                          {new Date(e.start_date).toLocaleDateString("es-MX", { day: "numeric", month: "short" })}
-                        </p>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-                <Link
-                  href="/events"
-                  className="block w-full text-center mt-4 sm:mt-5 py-3 sm:py-3.5 rounded-full bg-white/5 border border-white/10 text-sm font-bold text-white hover:bg-white/10 hover:border-primary/30 transition-all hover:scale-[1.02] active:scale-95"
-                >
-                  Ver todos los eventos
-                </Link>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </section>
   );
-};
+}
+

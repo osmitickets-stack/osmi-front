@@ -1,360 +1,84 @@
-// src/app/(public)/events/[public_id]/page.tsx
-
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cache } from "react";
-import { Calendar, MapPin, Clock, Users, Sparkles, ArrowRight, Share2, Heart } from "lucide-react";
-
-import EventMapWrapper from "@/components/events/EventMapWrapper";
-import BuyTicketCard from "@/components/events/BuyTicketCard";
+import { ArrowLeft, CalendarDays, Clock3, MapPin } from "lucide-react";
 import { Navbar } from "@/components/navigation/Navbar";
 import { Footer } from "@/components/navigation/Footer";
+import EventMapWrapper from "@/components/events/EventMapWrapper";
+import BuyTicketCard from "@/components/events/BuyTicketCard";
 import { api } from "@/lib/api";
+import { normalizeEvent, type NormalizedEvent, type RawEvent } from "@/modules/events/utils/normalizer";
 
-import {
-  normalizeEvent,
-  type NormalizedEvent,
-  type RawEvent,
-} from "@/modules/events/utils/normalizer";
-
-// ============================================================
-// FETCH CACHEADO
-// ============================================================
-const getEvent = cache(
-  async (public_id: string): Promise<NormalizedEvent | null> => {
-    try {
-      const raw = await api.get<RawEvent>(`/v1/events/${public_id}`);
-      return normalizeEvent(raw);
-    } catch (error) {
-      console.error("Error fetching event:", error);
-      return null;
-    }
-  }
-);
-
-// ============================================================
-// SEO DINÁMICO
-// ============================================================
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ public_id: string }>;
-}): Promise<Metadata> {
-  const { public_id } = await params;
-
+const getEvent = cache(async (publicId: string): Promise<NormalizedEvent | null> => {
   try {
-    const event = await getEvent(public_id);
+    const raw = await api.get<RawEvent>(`/v1/events/${publicId}`);
+    const event = normalizeEvent(raw);
+    return { ...event, latitude: raw.latitude ?? event.latitude, longitude: raw.longitude ?? event.longitude };
+  } catch { return null; }
+});
 
-    if (!event) {
-      return {
-        title: "Evento no encontrado - osmi",
-      };
-    }
-
-    return {
-      title: `${event.name} - osmi`,
-      description:
-        event.description?.slice(0, 160) ||
-        `Compra boletos para ${event.name} en ${event.location}. ¡Vive la experiencia con osmi!`,
-      openGraph: {
-        title: `${event.name} - osmi Tickets`,
-        description: event.description?.slice(0, 160) || "",
-        images: event.image_url ? [event.image_url] : [],
-        type: "website",
-        locale: "es_MX",
-      },
-    };
-  } catch {
-    return {
-      title: "Evento no encontrado - osmi",
-    };
-  }
+export async function generateMetadata({ params }: { params: Promise<{ public_id: string }> }): Promise<Metadata> {
+  const { public_id } = await params;
+  const event = await getEvent(public_id);
+  if (!event) return { title: "Evento no encontrado", robots: { index: false } };
+  return {
+    title: event.name,
+    description: event.description?.slice(0, 160) || `Consulta los detalles y boletos para ${event.name} en OSMI.`,
+    alternates: { canonical: `/events/${public_id}` },
+    openGraph: { title: event.name, description: event.description?.slice(0, 160), images: event.image_url ? [event.image_url] : [] },
+  };
 }
 
-// ============================================================
-// PÁGINA PRINCIPAL
-// ============================================================
-export default async function EventPage({
-  params,
-}: {
-  params: Promise<{ public_id: string }>;
-}) {
+export default async function EventPage({ params }: { params: Promise<{ public_id: string }> }) {
   const { public_id } = await params;
-
   const event = await getEvent(public_id);
-
-  if (!event) {
-    notFound();
-  }
-
-  const formattedDate = new Date(event.start_date).toLocaleDateString(
-    "es-MX",
-    {
-      weekday: "long",
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    }
-  );
-
-  const formattedTime = new Date(event.start_date).toLocaleTimeString(
-    "es-MX",
-    {
-      hour: "2-digit",
-      minute: "2-digit",
-    }
-  );
-
-  // CORREGIDO: solo usar name, slug no existe en NormalizedEvent
-  const isDesfragmentado = event.name?.toLowerCase().includes("desfragmentado");
+  if (!event) notFound();
+  const date = new Date(event.start_date);
+  const formattedDate = date.toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+  const formattedTime = date.toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" });
+  const hasMap = typeof event.latitude === "number" && typeof event.longitude === "number" && Number.isFinite(event.latitude) && Number.isFinite(event.longitude) && Math.abs(event.latitude) <= 90 && Math.abs(event.longitude) <= 180 && (event.latitude !== 0 || event.longitude !== 0);
 
   return (
-    <div className="min-h-screen flex flex-col bg-black">
+    <div className="flex min-h-screen flex-col bg-background">
       <Navbar />
-
-      {/* ==================== HERO ==================== */}
-      <div className="relative w-full h-[50vh] md:h-[60vh] lg:h-[70vh] overflow-hidden">
-        {event.image_url ? (
-          <>
-            <Image 
-              src={event.image_url}
-              alt={event.name}
-              fill
-              priority
-              sizes="(max-width: 768px) 100vw, 50vw"
-              className="object-cover scale-105"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-black/40" />
-            <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
-          </>
-        ) : (
-          <div className="w-full h-full bg-gradient-to-br from-secondary via-primary/30 to-background flex items-center justify-center">
-            <span className="text-8xl font-bold text-gradient opacity-20">
-              OSMI
-            </span>
-          </div>
-        )}
-
-        <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 md:p-12 z-10">
-          <div className="max-w-4xl">
-            <div className="flex flex-wrap items-center gap-3 mb-4">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/20 backdrop-blur-md px-4 py-1.5 text-xs font-bold text-primary ring-1 ring-primary/30">
-                {event.min_price > 0
-                  ? `Desde $${event.min_price.toLocaleString("es-MX")} MXN`
-                  : "Boletos pronto disponibles"}
-              </span>
-              {isDesfragmentado && (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary/20 backdrop-blur-md px-4 py-1.5 text-xs font-bold text-secondary ring-1 ring-secondary/30">
-                  <Sparkles size={12} />
-                  Colaboración exclusiva
-                </span>
-              )}
-            </div>
-
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black text-white leading-[1.05] mb-4 drop-shadow-[0_4px_20px_rgba(0,0,0,0.8)]">
-              {event.name}
-            </h1>
-
-            <div className="flex flex-wrap gap-3 sm:gap-5 text-sm sm:text-base text-gray-300">
-              <div className="flex items-center gap-2 bg-black/40 backdrop-blur-sm px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-white/10">
-                <Calendar size={16} className="text-secondary flex-shrink-0" />
-                <span className="drop-shadow-sm">{formattedDate}</span>
-              </div>
-              <div className="flex items-center gap-2 bg-black/40 backdrop-blur-sm px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-white/10">
-                <Clock size={16} className="text-secondary flex-shrink-0" />
-                <span className="drop-shadow-sm">{formattedTime}</span>
-              </div>
-              <div className="flex items-center gap-2 bg-black/40 backdrop-blur-sm px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-white/10">
-                <MapPin size={16} className="text-secondary flex-shrink-0" />
-                <span className="drop-shadow-sm">{event.location || "Ubicación por confirmar"}</span>
-              </div>
-            </div>
-          </div>
+      <main className="flex-1">
+        <div className="section-inner px-4 pt-6 sm:px-6 lg:px-8">
+          <Link href="/events" className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-muted transition hover:text-white"><ArrowLeft size={16} /> Volver a eventos</Link>
         </div>
-
-        <div className="absolute top-4 right-4 z-20 flex gap-2">
-          <button className="w-10 h-10 rounded-full bg-black/50 backdrop-blur-md border border-white/10 flex items-center justify-center text-white hover:bg-black/70 hover:border-primary/30 transition-all">
-            <Heart size={18} />
-          </button>
-          <button className="w-10 h-10 rounded-full bg-black/50 backdrop-blur-md border border-white/10 flex items-center justify-center text-white hover:bg-black/70 hover:border-primary/30 transition-all">
-            <Share2 size={18} />
-          </button>
-        </div>
-      </div>
-
-      {/* ==================== CONTENIDO ==================== */}
-      <div className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
-          
-          <div className="lg:col-span-2 space-y-8">
-            
-            {event.description && (
-              <div className="glass-card p-6 sm:p-8 border border-white/10">
-                <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 flex items-center gap-2">
-                  <Sparkles size={20} className="text-primary" />
-                  Sobre el evento
-                </h2>
-                <div className="text-gray-300 leading-relaxed whitespace-pre-wrap">
-                  {event.description}
-                </div>
-              </div>
-            )}
-
-            <div className="glass-card p-6 sm:p-8 border border-white/10">
-              <h2 className="text-xl sm:text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                <Users size={20} className="text-secondary" />
-                Lineup
-              </h2>
-              <div className="flex items-center gap-4 p-4 sm:p-5 rounded-xl bg-white/5 border border-white/5 hover:border-primary/20 transition-all">
-                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-2xl font-bold text-white flex-shrink-0">
-                  {event.name.charAt(0)}
-                </div>
-                <div>
-                  <p className="font-bold text-lg text-white">
-                    {event.name}
-                  </p>
-                  <p className="text-sm text-muted">
-                    Artista principal
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="glass-card p-6 sm:p-8 border border-white/10 overflow-hidden">
-              <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 flex items-center gap-2">
-                <MapPin size={20} className="text-accent" />
-                Ubicación
-              </h2>
-              <div className="flex items-center gap-2 text-muted text-sm mb-4">
-                <MapPin size={14} className="text-secondary flex-shrink-0" />
-                <span>{event.location || "Ubicación por confirmar"}</span>
-              </div>
-              <div className="rounded-xl overflow-hidden border border-white/10">
-                <EventMapWrapper 
-                  location={event.location || "Ubicación"} 
-                  latitude={event.latitude}
-                  longitude={event.longitude}
-                />
+        <section className="section-inner px-4 pt-4 sm:px-6 lg:px-8">
+          <div className="relative isolate flex min-h-[440px] items-end overflow-hidden rounded-[28px] border border-white/10 bg-[#180e2e] sm:min-h-[500px] sm:rounded-[36px]">
+            {event.image_url ? <Image src={event.image_url} alt="" fill priority sizes="(max-width: 1280px) 100vw, 1280px" className="object-cover" /> : <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,#602483,transparent_45%),linear-gradient(120deg,#261440,#0b0918)]" />}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#080510]/95 via-[#080510]/60 to-[#080510]/10" />
+            <div className="relative z-10 max-w-4xl p-6 sm:p-10 lg:p-12">
+              {event.min_price > 0 && <p className="mb-4 w-fit rounded-full border border-primary/35 bg-primary/15 px-3 py-1.5 text-xs font-bold text-[#ff80e7]">Desde ${event.min_price.toLocaleString("es-MX")} MXN</p>}
+              <h1 className="text-[clamp(2.3rem,5vw,4.8rem)] font-black leading-[1.05] tracking-[-.05em] text-white">{event.name}</h1>
+              <div className="mt-6 flex flex-wrap gap-3 text-sm text-white/85">
+                <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/35 px-3 py-2 backdrop-blur"><CalendarDays size={16} className="text-primary" />{formattedDate}</span>
+                <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/35 px-3 py-2 backdrop-blur"><Clock3 size={16} className="text-primary" />{formattedTime}</span>
+                {event.location && <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/35 px-3 py-2 backdrop-blur"><MapPin size={16} className="text-primary" />{event.location}</span>}
               </div>
             </div>
           </div>
-
-          <div className="lg:col-span-1">
-            <div className="sticky top-24">
-              <BuyTicketCard
-                eventId={event.public_id}
-                eventName={event.name}
-                formattedDate={formattedDate}
-                formattedTime={formattedTime}
-                location={event.location}
-              />
-            </div>
+        </section>
+        <div className="section-inner grid gap-8 px-4 py-12 sm:px-6 sm:py-16 lg:grid-cols-[minmax(0,1.7fr)_minmax(300px,.8fr)] lg:gap-10 lg:px-8">
+          <div className="min-w-0 space-y-6">
+            {event.description && <section className="rounded-3xl border border-white/10 bg-[#111024] p-6 sm:p-8"><p className="mb-3 text-xs font-bold uppercase tracking-[.18em] text-primary">La experiencia</p><h2 className="text-2xl font-bold tracking-tight text-white">Sobre el evento</h2><p className="mt-5 whitespace-pre-wrap text-sm leading-7 text-white/75 sm:text-base">{event.description}</p></section>}
+            <section className="rounded-3xl border border-white/10 bg-[#111024] p-6 sm:p-8">
+              <p className="mb-3 text-xs font-bold uppercase tracking-[.18em] text-primary">Cómo llegar</p>
+              <h2 className="text-2xl font-bold tracking-tight text-white">Ubicación</h2>
+              <p className="mt-4 flex items-start gap-2 text-sm leading-6 text-muted"><MapPin size={17} className="mt-0.5 shrink-0 text-primary" />{event.location || "Ubicación por confirmar"}</p>
+              {hasMap && <div className="mt-6 overflow-hidden rounded-2xl border border-white/10"><EventMapWrapper location={event.location || "Lugar del evento"} latitude={event.latitude} longitude={event.longitude} /></div>}
+              {!hasMap && <p className="mt-5 rounded-xl border border-white/10 bg-white/[.03] p-4 text-sm leading-6 text-muted">El mapa estará disponible cuando el organizador confirme las coordenadas del lugar.</p>}
+            </section>
           </div>
+          <div className="min-w-0"><BuyTicketCard eventId={event.public_id} eventName={event.name} formattedDate={formattedDate} formattedTime={formattedTime} location={event.location} /></div>
         </div>
-      </div>
-
-      {/* ==================== RELACIONADOS ==================== */}
-      <section className="border-t border-white/5 bg-background-secondary/30 py-12 sm:py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl sm:text-3xl font-bold text-white">
-              También te puede interesar
-            </h2>
-            <Link href="/events" className="text-sm text-primary hover:text-secondary transition-colors flex items-center gap-1">
-              Ver todos
-              <ArrowRight size={16} />
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
-            <a
-              href="/tienda"
-              className="glass-card overflow-hidden group hover:glow-primary transition-all border border-white/10 hover:border-primary/20"
-            >
-              <div className="relative h-48 sm:h-52 overflow-hidden">
-                <Image
-                  src="https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=600"
-                  alt="Tienda física"
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-500"
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                <span className="absolute bottom-3 left-3 text-xs font-bold text-white/80 bg-black/50 backdrop-blur-sm px-3 py-1 rounded-full">
-                  Próximamente
-                </span>
-              </div>
-              <div className="p-4 sm:p-5">
-                <p className="text-sm sm:text-base font-semibold text-foreground group-hover:text-primary transition-colors">
-                  Tienda Física osmi
-                </p>
-                <p className="text-xs text-muted-dark mt-1">
-                  Recoge premios y compra merchandise exclusivo
-                </p>
-              </div>
-            </a>
-
-            <a
-              href="/escuela-arte"
-              className="glass-card overflow-hidden group hover:glow-primary transition-all border border-white/10 hover:border-primary/20"
-            >
-              <div className="relative h-48 sm:h-52 overflow-hidden">
-                <Image
-                  src="https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=600"
-                  alt="Escuela de arte"
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-500"
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                <span className="absolute bottom-3 left-3 text-xs font-bold text-white/80 bg-black/50 backdrop-blur-sm px-3 py-1 rounded-full">
-                  Próximamente
-                </span>
-              </div>
-              <div className="p-4 sm:p-5">
-                <p className="text-sm sm:text-base font-semibold text-foreground group-hover:text-primary transition-colors">
-                  Escuela de Arte
-                </p>
-                <p className="text-xs text-muted-dark mt-1">
-                  Aprende con los mejores artistas
-                </p>
-              </div>
-            </a>
-
-            <a
-              href="/escuela-tatuaje"
-              className="glass-card overflow-hidden group hover:glow-primary transition-all border border-white/10 hover:border-primary/20"
-            >
-              <div className="relative h-48 sm:h-52 overflow-hidden">
-                <Image
-                  src="https://res.cloudinary.com/dkasxv8fj/image/upload/v1780564936/WhatsApp_Image_2026-03-08_at_7.52.00_PM_cog96f.jpg"
-                  alt="Escuela de tatuaje"
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-500"
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                <span className="absolute bottom-3 left-3 text-xs font-bold text-white/80 bg-black/50 backdrop-blur-sm px-3 py-1 rounded-full">
-                  Próximamente
-                </span>
-              </div>
-              <div className="p-4 sm:p-5">
-                <p className="text-sm sm:text-base font-semibold text-foreground group-hover:text-primary transition-colors">
-                  Escuela de Tatuaje
-                </p>
-                <p className="text-xs text-muted-dark mt-1">
-                  Formación profesional en tatuaje
-                </p>
-              </div>
-            </a>
-          </div>
-        </div>
-      </section>
-
+        <div className="section-inner px-4 pb-16 sm:px-6 lg:px-8"><Link href="/events" className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-primary hover:text-white">Explorar más eventos <ArrowLeft size={16} className="rotate-180" /></Link></div>
+      </main>
       <Footer />
     </div>
   );
 }
+
