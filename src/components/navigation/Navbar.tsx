@@ -1,276 +1,97 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter, usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
-import type { FormEvent } from "react";
-import { Ticket, LogOut, Menu, X, Search, Building2 } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState, type FormEvent } from "react";
+import { ArrowRight, LogOut, Menu, Search, Ticket, X } from "lucide-react";
 import { API_BASE_URL } from "@/lib/api";
 
 function getCookie(name: string): string | null {
   if (typeof document === "undefined") return null;
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop()?.split(";").shift() || null;
-  return null;
+  return document.cookie.split("; ").find((part) => part.startsWith(`${name}=`))?.slice(name.length + 1) ?? null;
 }
 
-export const Navbar = () => {
-  const router = useRouter();
+export function Navbar() {
   const pathname = usePathname();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isOrganizer, setIsOrganizer] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const router = useRouter();
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [organizer, setOrganizer] = useState(false);
+  const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
-
-  const handleSearch = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const query = search.trim();
-    router.push(query ? `/events?search=${encodeURIComponent(query)}` : "/events");
-    setMobileOpen(false);
-  };
 
   useEffect(() => {
     let cancelled = false;
     const frame = requestAnimationFrame(() => {
       const token = getCookie("token");
-      setIsLoggedIn(Boolean(token));
-      if (!token) {
-        setIsOrganizer(false);
-        return;
-      }
-
+      setLoggedIn(Boolean(token));
+      if (!token) { setOrganizer(false); return; }
       void (async () => {
         try {
           const payload = JSON.parse(atob(token.split(".")[1]));
-          const userId = payload.user_id;
-          const res = await fetch(`${API_BASE_URL}/v1/organizers?user_id=${encodeURIComponent(userId)}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          const data = res.ok ? await res.json() : null;
-          const organizer = data?.organizers?.[0];
-          if (!cancelled) setIsOrganizer(organizer?.approval_status === "approved");
-        } catch {
-          if (!cancelled) setIsOrganizer(false);
-        }
+          const response = await fetch(`${API_BASE_URL}/v1/organizers?user_id=${encodeURIComponent(payload.user_id)}`, { headers: { Authorization: `Bearer ${token}` } });
+          const data = response.ok ? await response.json() : null;
+          if (!cancelled) setOrganizer(data?.organizers?.[0]?.approval_status === "approved");
+        } catch { if (!cancelled) setOrganizer(false); }
       })();
     });
-    return () => {
-      cancelled = true;
-      cancelAnimationFrame(frame);
-    };
+    return () => { cancelled = true; cancelAnimationFrame(frame); };
   }, [pathname]);
 
-  const handleLogout = () => {
+  const navigateSearch = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const query = search.trim();
+    router.push(query ? `/events?search=${encodeURIComponent(query)}` : "/events");
+    setOpen(false);
+  };
+
+  const logout = () => {
     document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-    setIsLoggedIn(false);
-    setIsOrganizer(false);
+    setLoggedIn(false); setOrganizer(false); setOpen(false);
     router.push("/");
   };
 
+  const linkClass = (active: boolean) => `inline-flex min-h-11 items-center rounded-xl px-4 text-sm font-semibold transition focus-visible:outline-2 focus-visible:outline-primary ${active ? "bg-primary/15 text-[#ff86e8]" : "text-white/70 hover:bg-white/[.06] hover:text-white"}`;
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-white/[0.06] bg-background/80 backdrop-blur-2xl">
-      <div className="mx-auto flex h-16 w-full max-w-[1600px] items-center justify-between px-4 sm:px-6 lg:px-8">
-        
-        {/* ======================== LOGO ======================== */}
-        <Link
-          href="/"
-          className="shrink-0 whitespace-nowrap text-2xl font-black tracking-tight text-gradient"
-        >
-          ★ MyOsmi ★
-        </Link>
-
-        {/* ======================== SEARCH ======================== */}
-        <form onSubmit={handleSearch} role="search" className="hidden lg:flex relative max-w-[380px] flex-1 mx-4">
-          <button type="submit" aria-label="Buscar eventos" className="absolute left-2 top-1/2 z-10 -translate-y-1/2 rounded-lg p-2 text-muted-dark hover:text-foreground focus-visible:outline-2 focus-visible:outline-primary">
-            <Search size={16} aria-hidden="true" />
-          </button>
-          <input
-            type="text"
-            aria-label="Buscar eventos"
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            placeholder="Buscar eventos, artistas, lugares..."
-            className="h-11 w-full rounded-xl border border-white/[0.06] bg-white/[0.03] pl-11 pr-4 text-sm text-foreground placeholder:text-muted-dark outline-none transition-all focus:border-primary/30 focus:bg-white/[0.05] focus:ring-2 focus:ring-primary/10"
-          />
-        </form>
-
-        {/* ======================== CENTRO: NAVEGACIÓN ======================== */}
-        <nav className="hidden lg:flex items-center gap-6">
-          <Link
-            href="/events"
-            className={`whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-              pathname.startsWith("/events")
-                ? "bg-white/[0.06] text-foreground"
-                : "text-muted hover:bg-white/[0.03] hover:text-foreground"
-            }`}
-          >
-            Explorar
-          </Link>
-
-          <Link
-            href="/events#categorias"
-            className={`whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-              pathname.startsWith("/categorias")
-                ? "bg-white/[0.06] text-foreground"
-                : "text-muted hover:bg-white/[0.03] hover:text-foreground"
-            }`}
-          >
-            Categorías
-          </Link>
-
-          <Link href="/ayuda" className="whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium text-muted transition-colors hover:bg-white/[0.03] hover:text-foreground">
-            Ayuda
-          </Link>
-
-          {/* ======================== BOTÓN PARA ORGANIZADORES (SOLO SI ES ORGANIZADOR) ======================== */}
-          {isOrganizer && (
-            <Link
-              href="/organizador"
-              className={`whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium transition-colors flex items-center gap-1.5 ${
-                pathname.startsWith("/organizador")
-                  ? "bg-primary/10 text-primary border border-primary/20"
-                  : "text-muted hover:bg-white/[0.03] hover:text-foreground"
-              }`}
-            >
-              <Building2 size={16} />
-              Mi Panel
-            </Link>
-          )}
+    <header className="sticky top-0 z-50 border-b border-white/10 bg-[#080611]/95 backdrop-blur-xl">
+      <div className="section-inner flex h-[72px] items-center gap-4 px-4 sm:px-6 lg:px-8">
+        <Link href="/" aria-label="OSMI, inicio" className="inline-flex shrink-0 items-center gap-2 text-xl font-black tracking-[-.06em] text-white focus-visible:outline-2 focus-visible:outline-primary"><span className="grid size-9 place-items-center rounded-xl bg-primary text-[#17051c]"><Ticket size={21} strokeWidth={2.5} /></span>OSMI<span className="text-primary">.</span></Link>
+        <nav aria-label="Navegación principal" className="ml-4 hidden items-center gap-1 xl:flex">
+          <Link href="/events" className={linkClass(pathname.startsWith("/events"))}>Explorar</Link>
+          <Link href="/events#categorias" className={linkClass(false)}>Categorías</Link>
+          <Link href="/para-organizadores" className={linkClass(pathname.startsWith("/para-organizadores"))}>Organizadores</Link>
+          <Link href="/ayuda" className={linkClass(pathname.startsWith("/ayuda"))}>Ayuda</Link>
         </nav>
-
-        {/* ======================== DERECHA: AUTH ======================== */}
-        <div className="hidden lg:flex items-center gap-3 shrink-0">
-          {isLoggedIn ? (
+        <form onSubmit={navigateSearch} role="search" className="ml-auto hidden min-w-0 max-w-xs flex-1 items-center rounded-xl border border-white/10 bg-white/[.04] focus-within:border-primary/50 md:flex">
+          <Search size={17} className="ml-3 shrink-0 text-muted" aria-hidden="true" />
+          <input aria-label="Buscar eventos" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Buscar eventos..." className="h-10 min-w-0 flex-1 bg-transparent px-3 text-sm text-white placeholder:text-muted outline-none" />
+          <button type="submit" aria-label="Enviar búsqueda" className="mr-1 grid size-9 shrink-0 place-items-center rounded-lg text-muted transition hover:bg-primary/20 hover:text-white"><ArrowRight size={16} /></button>
+        </form>
+        <div className="ml-auto hidden shrink-0 items-center gap-2 md:flex">
+          {loggedIn ? (
             <>
-              <Link
-                href="/dashboard"
-                className="flex items-center gap-2 whitespace-nowrap rounded-xl px-4 py-2.5 text-sm font-medium text-muted transition-colors hover:bg-white/[0.03] hover:text-foreground"
-              >
-                <Ticket size={16} />
-                Mis boletos
-              </Link>
-              <button
-                onClick={handleLogout}
-                className="flex items-center gap-2 whitespace-nowrap rounded-xl px-4 py-2.5 text-sm font-medium text-muted transition-colors hover:bg-white/[0.03] hover:text-foreground"
-              >
-                <LogOut size={16} />
-                Salir
-              </button>
+              <Link href="/dashboard" className={linkClass(pathname.startsWith("/dashboard"))}><Ticket size={16} className="mr-2" />Mis boletos</Link>
+              {organizer && <Link href="/organizador" className={linkClass(pathname.startsWith("/organizador"))}>Mi panel</Link>}
+              <button type="button" onClick={logout} aria-label="Cerrar sesión" title="Cerrar sesión" className="grid size-11 place-items-center rounded-xl text-muted transition hover:bg-white/[.06] hover:text-white"><LogOut size={18} /></button>
             </>
           ) : (
             <>
-              <Link
-                href="/login"
-                className="whitespace-nowrap rounded-xl border border-white/[0.06] px-5 py-2.5 text-sm font-medium text-muted transition-colors hover:bg-white/[0.03] hover:text-foreground"
-              >
-                Iniciar Sesión
-              </Link>
-              <Link
-                href="/register"
-                className="whitespace-nowrap rounded-xl bg-primary px-8 py-3 text-sm font-bold text-white shadow-lg shadow-primary/20 transition-all hover:bg-primary/90"
-              >
-                Registrarse
-              </Link>
+              <Link href="/login" className={linkClass(pathname === "/login")}>Entrar</Link>
+              <Link href="/register" className="inline-flex min-h-11 items-center rounded-xl bg-primary px-5 text-sm font-bold text-[#16051a] transition hover:bg-[#ff78e3] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">Crear cuenta</Link>
             </>
           )}
         </div>
-
-        {/* ======================== MOBILE TOGGLE ======================== */}
-        <button
-          className="ml-auto shrink-0 p-2 text-foreground lg:hidden"
-          onClick={() => setMobileOpen(!mobileOpen)}
-          aria-label="Menú"
-        >
-          {mobileOpen ? <X size={22} /> : <Menu size={22} />}
-        </button>
+        <button type="button" aria-label={open ? "Cerrar menú" : "Abrir menú"} aria-expanded={open} aria-controls="mobile-navigation" onClick={() => setOpen(!open)} className="ml-auto grid size-11 place-items-center rounded-xl border border-white/10 text-white md:hidden">{open ? <X size={21} /> : <Menu size={21} />}</button>
       </div>
-
-      {/* ======================== MOBILE MENU ======================== */}
-      {mobileOpen && (
-        <div className="lg:hidden border-t border-white/[0.06] bg-background/95 backdrop-blur-2xl px-6 py-5 space-y-4 fade-in">
-          <form onSubmit={handleSearch} role="search" className="relative">
-            <button type="submit" aria-label="Buscar eventos" className="absolute left-2 top-1/2 z-10 -translate-y-1/2 rounded-lg p-2 text-muted-dark hover:text-foreground focus-visible:outline-2 focus-visible:outline-primary">
-              <Search size={16} aria-hidden="true" />
-            </button>
-            <input
-              type="text"
-              aria-label="Buscar eventos"
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Buscar eventos..."
-              className="w-full h-11 rounded-xl border border-white/[0.06] bg-white/[0.03] pl-11 pr-4 text-sm text-foreground placeholder:text-muted-dark outline-none focus:border-primary/30 focus:bg-white/[0.05]"
-            />
-          </form>
-
-          <Link
-            href="/events"
-            className="block py-2.5 text-sm font-medium text-muted hover:text-foreground transition-colors"
-            onClick={() => setMobileOpen(false)}
-          >
-            Explorar
-          </Link>
-          <Link
-            href="/events#categorias"
-            className="block py-2.5 text-sm font-medium text-muted hover:text-foreground transition-colors"
-            onClick={() => setMobileOpen(false)}
-          >
-            Categorías
-          </Link>
-          <Link href="/ayuda" className="block py-2.5 text-sm font-medium text-muted hover:text-foreground transition-colors" onClick={() => setMobileOpen(false)}>
-            Ayuda y reembolsos
-          </Link>
-
-          {/* ======================== BOTÓN PARA ORGANIZADORES EN MÓVIL ======================== */}
-          {isOrganizer && (
-            <Link
-              href="/organizador"
-              className="block py-2.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors flex items-center gap-2"
-              onClick={() => setMobileOpen(false)}
-            >
-              <Building2 size={16} />
-              Mi Panel
-            </Link>
-          )}
-
-          <hr className="border-white/[0.06]" />
-
-          {isLoggedIn ? (
-            <>
-              <Link
-                href="/dashboard"
-                className="block py-2.5 text-sm font-medium text-primary"
-                onClick={() => setMobileOpen(false)}
-              >
-                Mis boletos
-              </Link>
-              <button
-                onClick={() => { handleLogout(); setMobileOpen(false); }}
-                className="block py-2.5 text-sm font-medium text-muted hover:text-foreground transition-colors"
-              >
-                Cerrar sesión
-              </button>
-            </>
-          ) : (
-            <>
-              <Link
-                href="/login"
-                className="block py-2.5 text-sm font-medium text-muted hover:text-foreground transition-colors"
-                onClick={() => setMobileOpen(false)}
-              >
-                Iniciar Sesión
-              </Link>
-              <Link
-                href="/register"
-                className="block w-full text-center py-3.5 rounded-xl bg-primary text-sm font-bold text-white hover:bg-primary/90 transition-all shadow-lg shadow-primary/20"
-                onClick={() => setMobileOpen(false)}
-              >
-                Registrarse
-              </Link>
-            </>
-          )}
-        </div>
-      )}
+      {open && <div id="mobile-navigation" className="border-t border-white/10 bg-[#0b0819] px-4 pb-5 pt-4 md:hidden">
+        <form onSubmit={navigateSearch} role="search" className="mx-auto mb-4 flex max-w-xl items-center rounded-xl border border-white/10 bg-white/[.05] px-3"><Search size={17} className="text-muted" /><input aria-label="Buscar eventos" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Buscar eventos..." className="h-12 min-w-0 flex-1 bg-transparent px-3 text-sm text-white outline-none" /><button type="submit" aria-label="Buscar" className="grid size-10 place-items-center text-primary"><ArrowRight size={18} /></button></form>
+        <nav aria-label="Navegación móvil" className="mx-auto grid max-w-xl gap-1">
+          {[["Explorar eventos","/events"],["Categorías","/events#categorias"],["Para organizadores","/para-organizadores"],["Ayuda y reembolsos","/ayuda"]].map(([label, href]) => <Link key={href} href={href} onClick={() => setOpen(false)} className="flex min-h-11 items-center rounded-xl px-3 text-sm font-semibold text-white/85 hover:bg-white/[.06]">{label}</Link>)}
+          <div className="mt-2 border-t border-white/10 pt-3">
+            {loggedIn ? <><Link href="/dashboard" onClick={() => setOpen(false)} className="flex min-h-11 items-center rounded-xl px-3 text-sm font-semibold text-white">Mis boletos</Link>{organizer && <Link href="/organizador" onClick={() => setOpen(false)} className="flex min-h-11 items-center rounded-xl px-3 text-sm font-semibold text-white">Mi panel</Link>}<button type="button" onClick={logout} className="flex min-h-11 w-full items-center rounded-xl px-3 text-left text-sm text-muted">Cerrar sesión</button></> : <div className="grid grid-cols-2 gap-3"><Link href="/login" onClick={() => setOpen(false)} className="flex min-h-11 items-center justify-center rounded-xl border border-white/20 text-sm font-semibold text-white">Entrar</Link><Link href="/register" onClick={() => setOpen(false)} className="flex min-h-11 items-center justify-center rounded-xl bg-primary text-sm font-bold text-[#16051a]">Crear cuenta</Link></div>}
+          </div>
+        </nav>
+      </div>}
     </header>
   );
-};
+}
+
