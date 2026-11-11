@@ -4,7 +4,6 @@ export const revalidate = 0;
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Music2, Trophy, Drama, PartyPopper, Sparkles, Shapes } from "lucide-react";
-import { Navbar } from "@/components/navigation/Navbar";
 import { HeroSection } from "@/components/home/HeroSection";
 import { EventCard } from "@/components/ui/EventCard";
 import { Footer } from "@/components/navigation/Footer";
@@ -60,7 +59,6 @@ export default async function HomePage() {
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <Navbar />
       <HeroSection events={events} />
 
       <section aria-labelledby="categories-title" className="section-inner px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
