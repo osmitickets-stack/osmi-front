@@ -61,7 +61,8 @@ export default async function HomePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <HeroSection events={events} />
 
-      <section aria-labelledby="categories-title" className="section-inner px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+      <div className="xl:pl-[224px]">
+      <section id="categorias" aria-labelledby="categories-title" className="section-inner scroll-mt-6 px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
         <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div>
             <p className="mb-3 text-xs font-bold uppercase tracking-[.22em] text-primary">Descubre</p>
@@ -80,7 +81,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section aria-labelledby="events-title" className="border-t border-white/5 bg-[#0a0717]">
+      <section id="conciertos" aria-labelledby="events-title" className="scroll-mt-6 border-t border-white/5 bg-[#0a0717]">
         <div className="section-inner px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
           <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
             <div>
@@ -91,8 +92,12 @@ export default async function HomePage() {
             <Link href="/events" className="inline-flex min-h-11 items-center gap-2 self-start text-sm font-semibold text-white underline decoration-primary/60 underline-offset-8 hover:text-primary sm:self-auto">Ver cartelera completa <ArrowRight size={16} /></Link>
           </div>
           {events.length ? (
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
-              {events.slice(0, 4).map((event) => <EventCard key={event.public_id} event={event} />)}
+            <div role="list" aria-label="Eventos en cartelera" className="flex snap-x snap-mandatory gap-5 overflow-x-auto pb-5 [scrollbar-color:#ff2bd6_#171024] [scrollbar-width:thin]">
+              {events.map((event) => (
+                <div role="listitem" key={event.public_id} className="w-[min(86vw,340px)] shrink-0 snap-start sm:w-[320px] lg:w-[340px]">
+                  <EventCard event={event} />
+                </div>
+              ))}
             </div>
           ) : (
             <div className="rounded-3xl border border-white/10 bg-white/[.03] px-6 py-12 text-center">
@@ -114,6 +119,7 @@ export default async function HomePage() {
         </div>
       </section>
       <Footer />
+      </div>
     </div>
   );
 }
