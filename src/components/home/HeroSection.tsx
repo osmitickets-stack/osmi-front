@@ -115,7 +115,7 @@ export function HeroSection({ events }: HeroSectionProps) {
             <Image key={slide.image} src={slide.image} alt="" fill priority className="object-cover object-center" sizes="(max-width: 1024px) 100vw, 72vw" />
             <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(4,2,11,.96)_0%,rgba(4,2,11,.82)_34%,rgba(4,2,11,.22)_74%,rgba(4,2,11,.06)_100%)]" />
             <div className="absolute inset-0 bg-gradient-to-t from-[#04020b]/88 via-transparent to-transparent" />
-            <div className="relative z-10 flex min-h-[560px] max-w-[720px] flex-col justify-center px-6 py-16 sm:min-h-[620px] sm:px-11 lg:min-h-[670px] lg:px-14">
+            <div className="relative z-10 flex min-h-[560px] max-w-[720px] flex-col justify-center px-6 pb-28 pt-14 sm:min-h-[620px] sm:px-11 sm:pb-28 sm:pt-16 lg:min-h-[670px] lg:px-14">
               <span className="mb-5 w-fit rounded-full border border-[#ff2bd6]/40 bg-[#ff2bd6]/15 px-3 py-1.5 text-[10px] font-black uppercase tracking-[.18em] text-[#ff7ae5]">{slide.eyebrow}</span>
               <h1 className="max-w-[650px] text-[clamp(2.55rem,5.1vw,5.4rem)] font-black leading-[.98] tracking-[-.06em] text-white">{slide.title}</h1>
               <p className="mt-5 max-w-[540px] text-sm leading-7 text-white/72 sm:text-base sm:leading-8">{slide.description}</p>
@@ -126,12 +126,19 @@ export function HeroSection({ events }: HeroSectionProps) {
                 <div className="flex items-center gap-3"><Headphones size={20} className="shrink-0 text-[#42ddff]" /><span className="text-xs font-semibold leading-5 text-white/78">Soporte real</span></div>
               </div>
             </div>
-            <div className="absolute bottom-5 right-5 z-20 flex items-center gap-2 sm:inset-x-5 sm:bottom-auto sm:right-auto sm:top-1/2 sm:-translate-y-1/2 sm:justify-between">
-              <button type="button" onClick={previousSlide} aria-label="Anuncio anterior" className="grid size-12 place-items-center rounded-full border border-white/22 bg-black/52 text-white shadow-lg backdrop-blur-md transition hover:border-[#ff2bd6]/70 hover:bg-[#ff2bd6]/25"><ChevronLeft size={21} /></button>
-              <button type="button" onClick={nextSlide} aria-label="Anuncio siguiente" className="grid size-12 place-items-center rounded-full border border-white/22 bg-black/52 text-white shadow-lg backdrop-blur-md transition hover:border-[#ff2bd6]/70 hover:bg-[#ff2bd6]/25"><ChevronRight size={21} /></button>
-            </div>
-            <div className="absolute bottom-7 left-1/2 z-20 flex -translate-x-1/2 gap-2" aria-label={`Anuncio ${slideIndex + 1} de ${slides.length}`}>
-              {slides.map((item, index) => <button key={item.image} type="button" onClick={() => setSlideIndex(index)} aria-label={`Mostrar anuncio ${index + 1}`} aria-current={index === slideIndex ? "true" : undefined} className={`h-2.5 rounded-full transition-all ${index === slideIndex ? "w-8 bg-[#ff2bd6] shadow-[0_0_14px_#ff2bd6]" : "w-2.5 bg-white/42 hover:bg-white/75"}`} />)}
+            <div className="absolute inset-x-4 bottom-4 z-20 flex items-center gap-2 rounded-2xl border border-white/[.11] bg-[#07040f]/78 p-2 shadow-[0_12px_40px_rgba(0,0,0,.35)] backdrop-blur-xl sm:inset-x-5 sm:gap-3">
+              <div className="grid min-w-0 flex-1 grid-cols-3 gap-1.5" aria-label={`Anuncio ${slideIndex + 1} de ${slides.length}`}>
+                {slides.map((item, index) => (
+                  <button key={item.image} type="button" onClick={() => setSlideIndex(index)} aria-label={`Mostrar anuncio ${index + 1}: ${item.eyebrow}`} aria-current={index === slideIndex ? "true" : undefined} className={`flex min-h-11 min-w-0 items-center gap-2 rounded-xl border px-2 text-left transition sm:px-3 ${index === slideIndex ? "border-[#ff2bd6]/45 bg-[#ff2bd6]/16 text-white shadow-[0_0_20px_rgba(255,43,214,.14)]" : "border-white/[.06] bg-white/[.025] text-white/42 hover:border-white/16 hover:text-white/72"}`}>
+                    <span className={`text-[10px] font-black tabular-nums ${index === slideIndex ? "text-[#ff62df]" : "text-white/30"}`}>0{index + 1}</span>
+                    <span className="hidden min-w-0 truncate text-[10px] font-bold md:block">{item.eyebrow}</span>
+                  </button>
+                ))}
+              </div>
+              <div className="flex shrink-0 gap-1.5">
+                <button type="button" onClick={previousSlide} aria-label="Anuncio anterior" className="grid size-11 place-items-center rounded-xl border border-white/12 bg-white/[.045] text-white transition hover:border-[#ff2bd6]/55 hover:bg-[#ff2bd6]/18"><ChevronLeft size={19} /></button>
+                <button type="button" onClick={nextSlide} aria-label="Anuncio siguiente" className="grid size-11 place-items-center rounded-xl border border-white/12 bg-white/[.045] text-white transition hover:border-[#ff2bd6]/55 hover:bg-[#ff2bd6]/18"><ChevronRight size={19} /></button>
+              </div>
             </div>
           </div>
 
