@@ -79,10 +79,7 @@ function Sidebar({ activeSection, closeMenu, profile }: { activeSection: string;
 
       <div className="my-4 h-px bg-gradient-to-r from-transparent via-white/12 to-transparent" />
 
-      <div className="space-y-1">
-        <Link href="/dashboard" onClick={closeMenu} className="group flex min-h-10 items-center gap-3 rounded-xl px-3.5 py-2 text-sm font-semibold text-white/62 transition hover:bg-white/[.05] hover:text-white focus-visible:outline-2 focus-visible:outline-[#ff2bd6]"><Ticket size={17} className="shrink-0 text-white/38 group-hover:text-[#ff5ddd]" />Mis boletos</Link>
-        <Link href={profile.loggedIn ? "/dashboard" : "/login"} onClick={closeMenu} className="group flex min-h-10 items-center gap-3 rounded-xl px-3.5 py-2 text-sm font-semibold text-white/62 transition hover:bg-white/[.05] hover:text-white focus-visible:outline-2 focus-visible:outline-[#ff2bd6]"><UserRound size={17} className="shrink-0 text-white/38 group-hover:text-[#ff5ddd]" />{profile.loggedIn ? "Mi perfil" : "Mi cuenta"}</Link>
-      </div>
+      <Link href={profile.loggedIn ? "/dashboard" : "/login"} onClick={closeMenu} className="group flex min-h-10 items-center gap-3 rounded-xl px-3.5 py-2 text-sm font-semibold text-white/62 transition hover:bg-white/[.05] hover:text-white focus-visible:outline-2 focus-visible:outline-[#ff2bd6]"><Ticket size={17} className="shrink-0 text-white/38 group-hover:text-[#ff5ddd]" />{profile.loggedIn ? "Mis boletos y perfil" : "Mis boletos"}</Link>
 
       <div className="mt-5 rounded-2xl border border-[#ff2bd6]/18 bg-[radial-gradient(circle_at_100%_0%,rgba(255,43,214,.16),transparent_48%),rgba(255,255,255,.025)] p-4 2xl:mt-auto">
         <span className="inline-flex rounded-full bg-[#ff2bd6]/15 px-2.5 py-1 text-[9px] font-black uppercase tracking-[.17em] text-[#ff75e4]">OSMI Experience</span>
@@ -97,7 +94,7 @@ function Sidebar({ activeSection, closeMenu, profile }: { activeSection: string;
             <span className="min-w-0 text-left"><span className="block truncate text-xs font-black text-white">{profile.name || "Mi perfil"}</span><span className="mt-0.5 block truncate text-[10px] text-white/46">Ver cuenta y boletos</span></span>
           </Link>
         ) : (
-          <Link href="/register" onClick={closeMenu} className="mt-4 inline-flex min-h-10 w-full items-center justify-center rounded-xl bg-[#ff2bd6] px-3 py-2 text-center text-xs font-black text-[#17051b] transition hover:bg-[#ff73e3] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">Crear cuenta</Link>
+          <Link href="/login" onClick={closeMenu} className="mt-4 inline-flex min-h-10 w-full items-center justify-center rounded-xl bg-[#ff2bd6] px-3 py-2 text-center text-xs font-black text-[#17051b] transition hover:bg-[#ff73e3] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">Entrar o crear cuenta</Link>
         )}
       </div>
     </div>
@@ -174,12 +171,12 @@ export function HomeShell({ children }: HomeShellProps) {
   }, [mobileMenuOpen]);
 
   return (
-    <div className="min-h-screen bg-[#05020e] xl:grid xl:grid-cols-[224px_minmax(0,1fr)]">
-      <aside className="relative z-30 hidden min-h-full border-r border-white/[.065] bg-[linear-gradient(180deg,#080510_0%,#06030e_58%,#090414_100%)] xl:block">
-        <div className="sticky top-0 h-screen overflow-y-auto p-4"><Sidebar activeSection={activeSection} profile={profile} /></div>
+    <div className="min-h-screen bg-[radial-gradient(circle_at_18%_4%,rgba(104,46,205,.16),transparent_27%),linear-gradient(135deg,#05020e,#090416_55%,#05020e)] xl:grid xl:grid-cols-[224px_minmax(0,1fr)] xl:gap-4 xl:p-3">
+      <aside className="relative z-30 hidden min-h-full rounded-[24px] border border-white/[.07] bg-[linear-gradient(180deg,rgba(10,6,22,.96)_0%,rgba(6,3,14,.94)_58%,rgba(11,5,23,.96)_100%)] shadow-[0_24px_80px_rgba(0,0,0,.28)] xl:block">
+        <div className="sticky top-3 h-[calc(100vh-1.5rem)] overflow-y-auto p-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"><Sidebar activeSection={activeSection} profile={profile} /></div>
       </aside>
 
-      <div className="min-w-0">
+      <div className="min-w-0 xl:overflow-hidden xl:rounded-[24px] xl:border xl:border-white/[.055] xl:bg-[#06030f] xl:shadow-[0_24px_90px_rgba(0,0,0,.22)]">
         <header className="sticky top-0 z-50 flex h-16 items-center justify-between border-b border-white/[.07] bg-[#070510]/95 px-4 backdrop-blur-xl xl:hidden">
           <button type="button" onClick={() => setMobileMenuOpen(true)} aria-label="Abrir menú" aria-expanded={mobileMenuOpen} className="grid size-11 place-items-center rounded-xl border border-white/10 bg-white/[.04] text-white focus-visible:outline-2 focus-visible:outline-[#ff2bd6]"><Menu size={21} /></button>
           <Link href="#inicio" aria-label="OSMI, inicio" className="flex items-center gap-2 text-xl font-black tracking-[-.06em] text-white"><span className="grid size-9 place-items-center rounded-xl bg-gradient-to-br from-[#ff36d7] to-[#7c3cff] text-[#100414]"><Ticket size={20} /></span>OSMI<span className="-ml-2 text-[#ff2bd6]">.</span></Link>
