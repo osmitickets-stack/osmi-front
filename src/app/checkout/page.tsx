@@ -14,7 +14,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import { Navbar } from "@/components/navigation/Navbar";
 import { Footer } from "@/components/navigation/Footer";
 import { useCartStore } from "@/store/cart";
-import { API_BASE_URL, api } from "@/lib/api";
+import { api } from "@/lib/api";
 import {
   AlertCircle,
   Lock,
@@ -47,100 +47,6 @@ function getCookie(name: string) {
 }
 
 // ============================================================
-// CUSTOMER - Busca antes de crear para evitar duplicados
-// ============================================================
-async function resolveCustomerId(customerEmail: string) {
-  if (!customerEmail || !customerEmail.trim()) {
-    throw new Error("Customer email is required");
-  }
-  const cleanEmail = customerEmail.trim().toLowerCase();
-  const token = getCookie("token");
-
-  // Usuario logueado
-  if (token) {
-    try {
-      const userRes = await fetch(`${API_BASE_URL}/v1/auth/me`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      let userId = null;
-      if (userRes.ok) {
-        const userData = await userRes.json();
-        userId = userData.user_id || userData.id;
-      }
-      if (!userId) {
-        try {
-          const payload = JSON.parse(atob(token.split(".")[1]));
-          userId = payload.user_id;
-        } catch (e) { /* ignorar */ }
-      }
-      if (userId) {
-        const customerRes = await fetch(`${API_BASE_URL}/v1/customers?user_id=${userId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (customerRes.ok) {
-          const data = await customerRes.json();
-          const customers = data.customers || [];
-          if (customers.length > 0) {
-            return customers[0].publicId || customers[0].public_id || String(customers[0].id);
-          }
-        }
-        const createRes = await fetch(`${API_BASE_URL}/v1/customers`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            name: "Usuario Osmi",
-            email: cleanEmail,
-            customer_type: "registered",
-            user_id: userId,
-          }),
-        });
-        if (createRes.ok) {
-          const customer = await createRes.json();
-          return customer.publicId || customer.public_id || String(customer.id);
-        }
-      }
-    } catch (err) {
-      console.error("Error resolviendo customer:", err);
-    }
-  }
-
-  // Invitado: buscar primero por email
-  try {
-    const searchRes = await fetch(
-      `${API_BASE_URL}/v1/customers?email=${encodeURIComponent(cleanEmail)}`
-    );
-    if (searchRes.ok) {
-      const data = await searchRes.json();
-      const customers = data.customers || [];
-      if (customers.length > 0) {
-        return customers[0].publicId || customers[0].public_id || String(customers[0].id);
-      }
-    }
-
-    const guestRes = await fetch(`${API_BASE_URL}/v1/customers`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: "Invitado",
-        email: cleanEmail,
-        customer_type: "guest",
-      }),
-    });
-    if (guestRes.ok) {
-      const guest = await guestRes.json();
-      return guest.publicId || guest.public_id || String(guest.id);
-    }
-  } catch (err) {
-    console.error("Error con customer invitado:", err);
-  }
-
-  return null;
-}
-
-// ============================================================
 // PASO 1: INFO
 // ============================================================
 function CheckoutInfoStep({
@@ -157,6 +63,7 @@ function CheckoutInfoStep({
   const [name, setName] = useState("");
   const [emailError, setEmailError] = useState("");
   const [nameError, setNameError] = useState("");
+  const [accountEmail, setAccountEmail] = useState("");
   const [focusedField, setFocusedField] = useState<"name" | "email" | null>(null);
 
   useEffect(() => {
@@ -164,6 +71,18 @@ function CheckoutInfoStep({
     const savedName = localStorage.getItem("osmi_checkout_name") || "";
     setEmail(savedEmail);
     setName(savedName);
+    const token = getCookie("token");
+    if (!token) return;
+    let active = true;
+    void api.get<Record<string, unknown>>("/v1/auth/me", token).then((profile) => {
+      if (active && typeof profile.email === "string" && profile.email.trim()) {
+        setAccountEmail(profile.email.trim());
+        setEmail(profile.email.trim());
+      }
+    }).catch(() => {
+      // La creación de la orden comprobará la sesión y el correo.
+    });
+    return () => { active = false; };
   }, []);
 
   const total = tickets.reduce((sum, t) => sum + t.price * t.quantity, 0);
@@ -311,6 +230,7 @@ function CheckoutInfoStep({
                 <input
                   type="email"
                   value={email}
+                  readOnly={Boolean(accountEmail)}
                   onChange={(e) => { setEmail(e.target.value); setEmailError(""); }}
                   onFocus={() => setFocusedField("email")}
                   onBlur={() => setFocusedField(null)}
@@ -329,7 +249,7 @@ function CheckoutInfoStep({
                 </p>
               )}
               <p className="text-xs text-muted-dark mt-2 flex items-center gap-1">
-                <Mail size={12} /> Enviaremos tu boleto con código QR a este correo
+                <Mail size={12} /> {accountEmail ? "Usaremos el correo de tu cuenta para entregar el boleto y mostrarlo en Mis boletos." : "Enviaremos tu boleto con código QR a este correo."}
               </p>
             </div>
           </div>
@@ -690,22 +610,14 @@ export default function CheckoutPage() {
     setCustomerName(name);
 
     try {
-      const customerId = await resolveCustomerId(email);
-      if (!customerId) {
-        setError("No se pudo crear el comprador. Intenta de nuevo.");
-        setIsCreatingPayment(false);
-        return;
-      }
-
       const order = await api.post("/v1/orders", {
-        customer_id: customerId,
         items: tickets.map((t) => ({
           ticket_type_id: t.ticketTypeId,
           quantity: t.quantity,
         })),
         customer_email: email,
         customer_name: name,
-      });
+      }, getCookie("token") || undefined);
 
       const newOrderId = order.public_id || order.publicId || order.id;
 

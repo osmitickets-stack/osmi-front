@@ -130,6 +130,11 @@ function SuccessPageContent() {
     useState<OrderConfirmation | null>(null);
 
   const [error, setError] = useState("");
+  const [hasAccountSession, setHasAccountSession] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    setHasAccountSession(document.cookie.split("; ").some((part) => part.startsWith("token=")));
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -441,15 +446,24 @@ function SuccessPageContent() {
               </div>
             </div>
 
+            {hasAccountSession === false && (
+              <p className="mx-auto mb-6 max-w-xl rounded-2xl border border-primary/20 bg-primary/5 p-4 text-sm leading-6 text-muted">
+                Compraste como invitado. Tus boletos llegarán al correo indicado; conserva tu número de orden.
+                La sección «Mis boletos» está disponible para quienes iniciaron sesión antes de comprar.
+              </p>
+            )}
+
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
-              <button
-                onClick={() => router.push("/dashboard")}
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-gradient-to-r from-primary to-secondary text-white font-bold hover:shadow-2xl hover:shadow-primary/30 transition-all"
-              >
-                <Ticket size={18} />
-                Ver mis boletos
-                <ChevronRight size={16} />
-              </button>
+              {hasAccountSession === true && (
+                <button
+                  onClick={() => router.push("/dashboard")}
+                  className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-gradient-to-r from-primary to-secondary text-white font-bold hover:shadow-2xl hover:shadow-primary/30 transition-all"
+                >
+                  <Ticket size={18} />
+                  Ver mis boletos
+                  <ChevronRight size={16} />
+                </button>
+              )}
 
               <button
                 onClick={() => router.push("/events")}
