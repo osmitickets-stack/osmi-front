@@ -23,7 +23,19 @@ export function Footer() {
               <div key={group.title}>
                 <h2 className="mb-5 text-xs font-bold uppercase tracking-[.18em] text-white">{group.title}</h2>
                 <ul className="space-y-3">
-                  {group.items.map(({ label, href }) => <li key={`${label}-${href}`}><Link href={href} className="inline-flex min-h-7 items-center text-sm leading-5 text-muted transition hover:text-primary focus-visible:outline-2 focus-visible:outline-primary">{label}</Link></li>)}
+                  {group.items.map(({ label, href }) => (
+                    <li key={`${label}-${href}`}>
+                      {href.endsWith(".pdf") ? (
+                        <a href={href} className="inline-flex min-h-7 items-center text-sm leading-5 text-muted transition hover:text-primary focus-visible:outline-2 focus-visible:outline-primary">
+                          {label}
+                        </a>
+                      ) : (
+                        <Link href={href} className="inline-flex min-h-7 items-center text-sm leading-5 text-muted transition hover:text-primary focus-visible:outline-2 focus-visible:outline-primary">
+                          {label}
+                        </Link>
+                      )}
+                    </li>
+                  ))}
                 </ul>
               </div>
             ))}
